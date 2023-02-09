@@ -15,17 +15,32 @@ console.log(servConfig);
 
 const app = express();
 const router = express.Router();
+
 app.use('/', express.static(path.join(__dirname, "public", "html")));
+
 router.get('/hello', (req, resp, next) => {
 
     console.log('This is hello');
 	resp.status(200);
 	resp.setHeader('Content-Type', 'text/plain; charset=utf-8');
 	resp.flushHeaders();
-    resp.write('Hi lowe!');
-    resp.end();
+    resp.write('world');
 
     next();
+});
+
+router.get('/ping', (req, resp, next) => {
+
+    resp.status(200);
+    resp.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    resp.write('pong');
+
+    next();
+});
+
+router.use('*', (req, resp, next) => {
+
+    resp.end();
 });
 
 app.use(router);
