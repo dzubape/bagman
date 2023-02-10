@@ -4,17 +4,18 @@ import $ from 'jquery';
 
 const minTimelineWidth = 200;
 const minDescrColWidth = 200;
-let descrWidth = 2 * minDescrColWidth;
+let descriptionColumnWidth = 2 * minDescrColWidth;
 
 let style = $('<style>')
 .appendTo('head');
 
 let setDescrColWidth = (width) => {
 
-    style.text(`.cell.descr { width: ${width}px; }`)
+    style.text(`.cell.descr { width: ${width}px; }`);
+    descriptionColumnWidth = width;
 };
 
-setDescrColWidth(descrWidth)
+setDescrColWidth(descriptionColumnWidth)
 
 let roadmapBox = $('<div>')
 .addClass('roadmap')
@@ -31,6 +32,7 @@ let HeaderRow = function() {
 
         childBox.append(subTask.$);
         this.model.subtasks.push(subTask.model);
+        subTask.model.parent = this.model;
     };
 
     let row = $('<div>')
@@ -104,8 +106,8 @@ let FooterRow = function() {
 
         console.log('add epic');
 
-        new TaskRow();
-        // saveModel();
+        new TaskRow(roadmapCtrl);
+        saveModel();
     })
 
     $('<div>')
@@ -142,7 +144,7 @@ let onSplitterMove = (e) => {
         y: e.originalEvent.screenY,
     };
 
-    let initWidth = descrWidth;
+    let initWidth = descriptionColumnWidth;
     let currentWidth;
 
     let mouseMove = (e) => {
@@ -167,7 +169,7 @@ let onSplitterMove = (e) => {
     let mouseUp = (e) => {
 
         mouseMove(e);
-        descrWidth = currentWidth;
+        descriptionColumnWidth = currentWidth;
         $(window).off('mousemove', mouseMove);
         $(window).off('mouseup', mouseUp);
     };
@@ -178,6 +180,7 @@ let onSplitterMove = (e) => {
 
 let TaskRow = function(parentTask) {
 
+    // debugger
     // let initialDescr = 'Hello, I\'m an awful text. Try resize me!';
     let initialDescr = "Task description";
 
@@ -212,10 +215,10 @@ let TaskRow = function(parentTask) {
 
         let s = this.model.parent.subtasks;
         let idx = s.indexOf(this.model);
-        delete s[idx];
+        s.splice(idx, 1);
         this.$.remove();
 
-        localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
+        saveModel();
     };
 
     this.appendSubTask = (subTask) => {
@@ -289,7 +292,7 @@ let TaskRow = function(parentTask) {
         if(e.keyCode == codeEnter) {
 
             this.model.descr = text.text();
-            // saveModel();
+            saveModel();
 
             console.log(text.text());
             e.preventDefault();
@@ -312,7 +315,7 @@ let TaskRow = function(parentTask) {
     .blur((e) => {
 
         this.model.descr = text.text();
-        // saveModel();
+        saveModel();
 
         console.log(text.text());
         e.preventDefault();
@@ -337,7 +340,7 @@ let TaskRow = function(parentTask) {
     
             let task = new TaskRow(this);
             this.unRoll();
-            // saveModel();
+            saveModel();
         })
     )
     .append(
@@ -386,7 +389,14 @@ let saveModel = () => {
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
 
+    let settings = {
+        descriptionColumnWidth,
+    };
+
+    console.log(settings);
+
     localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
+    localStorage.setItem('roadmapSettings', JSON.stringify(settings));
 };
 
 let buildBranch = (taskCtrl, taskModel) => {
@@ -421,11 +431,20 @@ let loadModel = () => {
 
     roadmapModel = JSON.parse(roadmapModel);
     buildBranch(roadmapCtrl, roadmapModel);
+
+    let settings = localStorage.getItem('roadmapSettings');
+    if(settings) {
+
+        settings = JSON.parse(settings);
+        setDescrColWidth(settings.descriptionColumnWidth)
+    }
 };
 
 loadModel();
 
-$(window).on('unload', (e) => {
+// $(window).on('unload', (e) => {
 
-    saveModel();
-})
+//     saveModel();
+// })
+
+addEventListener('unload', saveModel);
