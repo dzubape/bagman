@@ -1,0 +1,67 @@
+body,
+div {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 10px;
+}
+
+.roadmap {
+
+    background: #71a0cc;
+}
+
+.epic {
+
+    background: #c2d3e2;
+}
+
+.epic:not(:first-child) {
+
+    border-top: solid 1px red;
+}
+
+.epic:nth-of-type(even) {
+
+    background: #71a0cc;
+}
+
+.row {
+    
+    display: flex;
+}
+
+.cell {
+
+    display: block;
+
+}
+
+.cell.descr .content {
+
+    padding: 5px 10px;
+    display: flex;
+}
+
+.cell.descr .content .arrow {
+
+    margin-right: 10px;
+}
+
+.v-splitter {
+
+    width: 3px;
+    background: #47729b;
+    /* height: 100%; */
+    cursor: ew-resize;
+}
+
+.v-splitter:before {
+
+    content: '.';
+    color: transparent;
+    font-size: 0;
+}

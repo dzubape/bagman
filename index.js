@@ -17,6 +17,7 @@ const app = express();
 const router = express.Router();
 
 app.use('/', express.static(path.join(__dirname, "public", "html")));
+app.use('/js', express.static(path.join(__dirname, "public", "js")));
 
 router.get('/hello', (req, resp, next) => {
 

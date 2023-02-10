@@ -4,13 +4,16 @@
   "description": "Packing of weighed entities",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "debug": "parcel --host 0.0.0.0 ./public/index.html"
   },
   "author": "Petro Dz.",
   "license": "ISC",
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
+    "jquery": "^3.6.3",
+    "parcel": "^2.8.3",
     "ts-node": "^10.9.1"
   }
 }
