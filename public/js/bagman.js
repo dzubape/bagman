@@ -429,6 +429,7 @@ let loadModel = () => {
     if(!roadmapModel)
         return;
 
+    console.log('loadModel:', roadmapModel);
     roadmapModel = JSON.parse(roadmapModel);
     buildBranch(roadmapCtrl, roadmapModel);
 

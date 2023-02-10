@@ -118,12 +118,6 @@ body {
 .epic .task .task .task .task .task .cell.descr { border-left-width: 100px; }
 .epic .task .task .task .task .task .task .cell.descr { border-left-width: 120px; }
 
-/* .row:not(:has(input:checked)) + .task { display: none !important; }
-.row:not(:has(input:checked)) + .task + .task { display: none !important; }
-.row:not(:has(input:checked)) + .task + .task + .task { display: none !important; }
-.row:not(:has(input:checked)) + .task + .task + .task + .task { display: none !important; }
-.row:not(:has(input:checked)) + .task + .task + .task + .task + .task { display: none !important; } */
-
 .cell.descr .content .arrow {
 
     margin-right: 10px;
