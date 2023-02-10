@@ -45,7 +45,35 @@ let HeaderRow = function() {
 
     let epicAppendor = $('<div>')
     .addClass('epic-appendor')
+    .addClass('child-box')
+    // .text('+ Добавить эпикчек')
     .appendTo(row)
+    .append(
+        $('<div>')
+        .addClass('row')
+        .append(
+            $('<div>')
+            .addClass('parent-box')
+            .append(
+                $('<div>')
+                .addClass('cell')
+                .addClass('descr')
+                .append(
+                    $('<div>')
+                    .addClass('content')
+                    .append(
+                        $('<div>')
+                        .addClass('text')
+                        .text('+ Dobavit')
+                    )
+                )
+            )
+            .append(
+                $('<div>')
+                .addClass('v-splitter')
+            )
+        )
+    )
 
     let descr = $('<div>')
     .addClass('cell')
@@ -61,6 +89,46 @@ let HeaderRow = function() {
     .text('Task description')
     .appendTo(content)
 
+    $('<div>')
+    .addClass('cell')
+    .addClass('v-splitter')
+    .appendTo(parentBox)  
+};
+
+let FooterRow = function() {
+
+    let row = $('<div>')
+    .addClass('row')
+    .addClass('footer')
+
+    this.$ = row;
+    row.appendTo(roadmapBox);
+
+    let parentBox = $('<div>')
+    .addClass('parent-box')
+    .appendTo(row)
+
+    let childBox = $('<div>')
+    .addClass('child-box')
+    .appendTo(row)
+
+    let epicAppendor = $('<div>')
+    .addClass('epic-appendor')
+    .appendTo(row)
+
+    let descr = $('<div>')
+    .addClass('cell')
+    .addClass('descr')
+    .appendTo(parentBox)
+
+    let content = $('<div>')
+    .addClass('content')
+    .appendTo(descr)
+
+    let text = $('<div>')
+    .addClass('text')
+    .text('+ Добавить эпикчек')
+    .appendTo(content)
 
     $('<div>')
     .addClass('cell')
@@ -182,6 +250,7 @@ let TaskRow = function(parentTask) {
 };
 
 let roadmap = new HeaderRow();
+let footer = new FooterRow();
 
 for(let i=0; i<10; ++i) {
 
