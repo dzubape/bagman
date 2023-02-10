@@ -3,7 +3,7 @@
 import $ from 'jquery';
 
 const minTimelineWidth = 200;
-const minDescrColWidth = 100;
+const minDescrColWidth = 200;
 let descrWidth = 2 * minDescrColWidth;
 
 let style = $('<style>')
@@ -23,9 +23,14 @@ let roadmapBox = $('<div>')
 
 let HeaderRow = function() {
 
+    this.model = {
+        subtasks: [],
+    };
+
     this.appendSubTask = (subTask) => {
 
         childBox.append(subTask.$);
+        this.model.subtasks.push(subTask.model);
     };
 
     let row = $('<div>')
@@ -42,38 +47,6 @@ let HeaderRow = function() {
     let childBox = $('<div>')
     .addClass('child-box')
     .appendTo(row)
-
-    let epicAppendor = $('<div>')
-    .addClass('epic-appendor')
-    .addClass('child-box')
-    // .text('+ Добавить эпикчек')
-    .appendTo(row)
-    .append(
-        $('<div>')
-        .addClass('row')
-        .append(
-            $('<div>')
-            .addClass('parent-box')
-            .append(
-                $('<div>')
-                .addClass('cell')
-                .addClass('descr')
-                .append(
-                    $('<div>')
-                    .addClass('content')
-                    .append(
-                        $('<div>')
-                        .addClass('text')
-                        .text('+ Dobavit')
-                    )
-                )
-            )
-            .append(
-                $('<div>')
-                .addClass('v-splitter')
-            )
-        )
-    )
 
     let descr = $('<div>')
     .addClass('cell')
@@ -93,6 +66,7 @@ let HeaderRow = function() {
     .addClass('cell')
     .addClass('v-splitter')
     .appendTo(parentBox)  
+    .mousedown(onSplitterMove)
 };
 
 let FooterRow = function() {
@@ -112,10 +86,6 @@ let FooterRow = function() {
     .addClass('child-box')
     .appendTo(row)
 
-    let epicAppendor = $('<div>')
-    .addClass('epic-appendor')
-    .appendTo(row)
-
     let descr = $('<div>')
     .addClass('cell')
     .addClass('descr')
@@ -126,31 +96,174 @@ let FooterRow = function() {
     .appendTo(descr)
 
     let text = $('<div>')
-    .addClass('text')
-    .text('+ Добавить эпикчек')
+    // .addClass('text')
+    .addClass('epic-appendor')
+    .text('+ Add epic')
     .appendTo(content)
+    .click(() => {
+
+        console.log('add epic');
+
+        new TaskRow();
+    })
 
     $('<div>')
     .addClass('cell')
     .addClass('v-splitter')
     .appendTo(parentBox)  
+    .mousedown(onSplitterMove)
 };
 
+//
+// Demo: Circular reference
+var circ = {};
+circ.circ = circ;
+
+// Note: cache should not be re-used by repeated calls to JSON.stringify.
+var cache = [];
+JSON.stringify(circ, (key, value) => {
+  if (typeof value === 'object' && value !== null) {
+    // Duplicate reference found, discard key
+    if (cache.includes(value)) return;
+
+    // Store value in our collection
+    cache.push(value);
+  }
+  return value;
+});
+cache = null; // Enable garbage collection
+//
+
+let modelWithoutParent = (task) => {
+
+    let m = {
+        descr: task.descr,
+        start: task.start,
+        duration: task.duration,
+        subtasks: [],
+    };
+
+    for(let i=0; i<task.subtasks.length; ++i) {
+
+        let subtask = task.subtasks[i];
+
+        m.subtasks.push(modelWithoutParent(subtask));
+    }
+
+    return m;
+}
+
+let onSplitterMove = (e) => {
+
+    let mousePressPos = {
+        x: e.originalEvent.screenX,
+        y: e.originalEvent.screenY,
+    };
+
+    let initWidth = descrWidth;
+    let currentWidth;
+
+    let mouseMove = (e) => {
+
+        let mouseMovePos = {
+            x: e.originalEvent.screenX,
+            y: e.originalEvent.screenY,
+        };
+
+        let currentPos = initWidth + mouseMovePos.x - mousePressPos.x;
+
+        currentPos = currentPos > 100
+            ? (currentPos < roadmapBox.width() - minTimelineWidth
+                ? currentPos
+                : roadmapBox.width() - minTimelineWidth
+            )
+            : 100;
+        setDescrColWidth(currentPos);
+        currentWidth = currentPos;
+    };
+
+    let mouseUp = (e) => {
+
+        mouseMove(e);
+        descrWidth = currentWidth;
+        $(window).off('mousemove', mouseMove);
+        $(window).off('mouseup', mouseUp);
+    };
+
+    $(window).mousemove(mouseMove);
+    $(window).mouseup(mouseUp);
+};
 
 let TaskRow = function(parentTask) {
+
+    // let initialDescr = 'Hello, I\'m an awful text. Try resize me!';
+    let initialDescr = "Task description";
+
+    this.model = {
+        descr: initialDescr,
+        start: null,
+        duration: null,
+        subtasks: [],
+        parent: null,
+    };
+
+    this.setDescription = (descr) => {
+
+        this.model.descr = descr;
+        text.text(descr);
+    };
+
+    this.setStart = (start) => {
+
+        this.model.start = start;
+        //! view update
+    };
+
+    this.setDuration = (duration) => {
+
+        this.model.duration = duration;
+        //! view update
+    };
+
+    this.remove = () => {
+
+        let s = this.model.parent.subtasks;
+        let idx = s.indexOf(this.model);
+        delete s[idx];
+        this.$.remove();
+
+        localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
+    };
 
     this.appendSubTask = (subTask) => {
 
         childBox.append(subTask.$);
+        this.model.subtasks.push(subTask.model);
+        subTask.model.parent = this.model;
+
+        let root = this.model;
+        while(root.parent)
+            root = root.parent;
+        console.log(root);
+    };
+
+    this.unRoll = () => {
+
+        openarrow.prop('checked', true);
+    };
+
+    this.collapse = () => {
+
+        openarrow.prop('checked', false);
     };
 
     let row = $('<div>')
     .addClass('row')
-    .addClass(parentTask ? 'task' : 'epic')
+    .addClass(parentTask == roadmapCtrl ? 'epic' : 'task')
 
     this.$ = row;
 
-    (parentTask || roadmap).appendSubTask(this);
+    (parentTask || roadmapCtrl).appendSubTask(this);
 
     let parentBox = $('<div>')
     .addClass('parent-box')
@@ -169,29 +282,96 @@ let TaskRow = function(parentTask) {
     .addClass('content')
     .appendTo(descr)
 
-    $('<input>')
+    let openarrow = $('<input>')
     .attr('type', 'checkbox')
     .appendTo(content);
 
     let text = $('<div>')
     .addClass('text')
-    .text('Hello, I\'m an awful text. Try resize me!')
+    .text(initialDescr)
     .attr('contenteditable', true)
     .appendTo(content)
-    .on('keydown', function(e) {
+    .on('keydown', (e) => {
 
         const codeEnter = 13;
+        const codeEsc = 27;
+        console.log(e.keyCode)
 
         if(e.keyCode == codeEnter) {
 
-            console.log($(this).text());
+            this.model.descr = text.text();
+            saveModel();
+
+            console.log(text.text());
             e.preventDefault();
 
-            $(this).blur();
+            text.blur();
 
             window.getSelection().removeAllRanges();
         }
-    });
+        else if(e.keyCode == codeEsc) {
+
+            e.preventDefault();
+
+            text.text(this.model.descr);
+
+            text.blur();
+
+            window.getSelection().removeAllRanges();
+        }
+    })
+    .blur((e) => {
+
+        this.model.descr = text.text();
+        saveModel();
+
+        console.log(text.text());
+        e.preventDefault();
+
+        window.getSelection().removeAllRanges();
+
+    })
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('task-tool-box')
+    .appendTo(descr)
+    .append(
+        $('<div>')
+        .addClass('button')
+        .addClass('task-appendor')
+        .html('&#8600;')
+        .html('&#65291;')
+        .html('&#11175;')
+        .html('	&#43;')
+        .click(() => {
+    
+            let task = new TaskRow(this);
+            this.unRoll();
+        })
+    )
+    .append(
+        $('<div>')
+        .addClass('button')
+        .addClass('task-remover')
+        .html('&#10005;')
+        .html('	&#8855;')
+        .html('	&#9746;')
+        .click(() => {
+    
+            if(confirm(`Remove task ${this.model.descr}`))
+                this.remove();
+        })
+    )
+
+
+    $('<div>')
+    .addClass('appendor-box-med')
+    .appendTo(parentBox)
+    .append(
+        $('<div>')
+        .addClass('append-button')
+    )
 
 
     $('<div>')
@@ -205,73 +385,47 @@ let TaskRow = function(parentTask) {
 
         return false;
     })
-    .mousedown((e) => {
-
-        console.log(e);
-
-        let mousePressPos = {
-            x: e.originalEvent.screenX,
-            y: e.originalEvent.screenY,
-        };
-
-        let initWidth = descrWidth;
-        let currentWidth;
-
-        let mouseMove = (e) => {
-
-            let mouseMovePos = {
-                x: e.originalEvent.screenX,
-                y: e.originalEvent.screenY,
-            };
-
-            let currentPos = initWidth + mouseMovePos.x - mousePressPos.x;
-
-            currentPos = currentPos > 100
-                ? (currentPos < roadmapBox.width() - minTimelineWidth
-                    ? currentPos
-                    : roadmapBox.width() - minTimelineWidth
-                )
-                : 100;
-            setDescrColWidth(currentPos);
-            currentWidth = currentPos;
-        };
-
-        let mouseUp = (e) => {
-
-            mouseMove(e);
-            descrWidth = currentWidth;
-            $(window).off('mousemove', mouseMove);
-            $(window).off('mouseup', mouseUp);
-        };
-
-        $(window).mousemove(mouseMove);
-        $(window).mouseup(mouseUp);
-    })
+    .mousedown(onSplitterMove)
 };
 
-let roadmap = new HeaderRow();
+let roadmapCtrl = new HeaderRow();
 let footer = new FooterRow();
 
-for(let i=0; i<10; ++i) {
+let saveModel = () => {
 
-    let epic = new TaskRow();
-    let task, subtask;
+    let roadmapModel = modelWithoutParent(roadmapCtrl.model);
+    console.log(roadmapModel);
 
-    task = new TaskRow(epic);
-    subtask = new TaskRow(task);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
+    localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
+};
 
-    task = new TaskRow(epic);
-    subtask = new TaskRow(task);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
+let buildBranch = (taskCtrl, taskModel) => {
 
-    task = new TaskRow(epic);
-    subtask = new TaskRow(task);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
-    new TaskRow(subtask);
+    console.log('buildBranch:', taskModel);
+
+    for(let i=0; i<taskModel.subtasks.length; ++i) {
+
+        let subTaskModel = taskModel.subtasks[i];
+
+        let subTaskCtrl = new TaskRow(taskCtrl);
+        subTaskCtrl.setDescription(subTaskModel.descr);
+        subTaskCtrl.setStart(subTaskModel.start);
+        subTaskCtrl.setDuration(subTaskModel.duration);
+
+        buildBranch(subTaskCtrl, subTaskModel);
+    }
 }
+
+let loadModel = () => {
+
+    let roadmapModel = localStorage.getItem('roadmap');
+    console.log('Model on load:', roadmapModel);
+
+    if(!roadmapModel)
+        return;
+
+    roadmapModel = JSON.parse(roadmapModel);
+    buildBranch(roadmapCtrl, roadmapModel);
+};
+
+loadModel();

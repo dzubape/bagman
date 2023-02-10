@@ -12,6 +12,12 @@ body {
 .roadmap {
 
     background: #71a0cc;
+    color: #021324;
+}
+
+.roadmap .header > .parent {
+    background: #177cd5;
+    color: #071d30;
 }
 
 .epic {
@@ -19,9 +25,14 @@ body {
     background: #c2d3e2;
 }
 
+.row.footer,
 .task {
 
     border-top: solid 1px #1a4267;
+}
+
+.task {
+
     background: #71a0cc;
 }
 
@@ -43,6 +54,9 @@ body {
 .parent-box {
     
     display: flex;
+    position: relative;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
 }
 
 .cell {
@@ -50,6 +64,11 @@ body {
     display: block;
     box-sizing: border-box;
 
+}
+
+.cell.descr {
+
+    display: flex;
 }
 
 .cell.descr .content {
@@ -85,12 +104,19 @@ body {
     visibility: hidden;
 }
 
-.epic .task .cell.descr { padding-left: 20px; }
-.epic .task .task .cell.descr { padding-left: 40px; }
-.epic .task .task .task .cell.descr { padding-left: 60px; }
-.epic .task .task .task .task .cell.descr { padding-left: 80px; }
-.epic .task .task .task .task .task .cell.descr { padding-left: 1000px; }
-.epic .task .task .task .task .task .task .cell.descr { padding-left: 1200px; }
+.epic .task .cell.descr {
+    
+    border-left: solid #d40808;
+    border-left: solid #c2d3e2;
+    border-left: solid #084b86;
+    border-left: solid #46759f;
+}
+.epic .task .cell.descr { border-left-width: 20px; }
+.epic .task .task .cell.descr { border-left-width: 40px; }
+.epic .task .task .task .cell.descr { border-left-width: 60px; }
+.epic .task .task .task .task .cell.descr { border-left-width: 80px; }
+.epic .task .task .task .task .task .cell.descr { border-left-width: 1000px; }
+.epic .task .task .task .task .task .task .cell.descr { border-left-width: 1200px; }
 
 /* .row:not(:has(input:checked)) + .task { display: none !important; }
 .row:not(:has(input:checked)) + .task + .task { display: none !important; }
@@ -137,5 +163,94 @@ body {
 
 .epic-appendor {
 
-
+    cursor: pointer;
 }
+
+.row.footer {
+
+    background: #c2d3e2
+}
+
+.task-appendor {
+
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.task-appendor.append-above {
+
+    vertical-align: top;
+}
+
+.task-appendor.append-below {
+
+    vertical-align: bottom;
+}
+
+.appendor-box-med {
+
+    position: absolute;
+    top: -1px;
+    height: 3px;
+    background: red;
+    width: 100%;
+    cursor: pointer;
+    display: none;
+}
+
+.appendor-box-med:hover .append-button {
+
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: #1a4267;
+    visibility: visible;
+}
+
+.appendor-box-med .append-button {
+    visibility: hidden;
+}
+
+.task-tool-box {
+
+    height: 100%;
+    vertical-align: middle;
+    padding: 5px;
+
+    flex: auto;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.task-tool-box .button {
+    display: inline-block;
+    margin-left: 3px;
+    font-size: 20px;
+    cursor: pointer;
+    border: solid 1px #ccc;
+    background: #acc0cb;
+    padding: 0 3px;
+    border-radius: 3px;
+    transition: color .1s;
+}
+
+.task-tool-box .button.task-appendor  {
+
+    color: #375b07;
+}
+
+.task-tool-box .button.task-appendor:hover  {
+
+    color: #209f57;
+}
+
+.task-tool-box .button.task-remover  {
+
+    color: #6b2222;
+}
+
+.task-tool-box .button.task-remover:hover  {
+
+    color: #f00000;
+}
+
