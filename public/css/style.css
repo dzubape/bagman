@@ -21,7 +21,8 @@ body {
 
 .task {
 
-    border-top: solid 1px #1a4267;;
+    border-top: solid 1px #1a4267;
+    background: #71a0cc;
 }
 
 .epic:not(:first-child) {
@@ -35,6 +36,11 @@ body {
 } */
 
 .row {
+
+    display: block;
+}
+
+.header {
     
     display: flex;
 }
@@ -61,21 +67,36 @@ body {
 
 .row:not(:has(+ .task)) .content input {
 
+    /* visibility: hidden; */
+}
+
+.row:has(> .header input:checked) >  .children {
+
+    display: block;
+}
+
+.row:not(:has(> .header input:checked)) .children {
+
+    display: none;
+}
+
+.row:not(:has(> .children > .row)) > .header input {
+
     visibility: hidden;
 }
 
-.epic + .task .cell.descr { padding-left: 10px; }
-.epic + .task + .task .cell.descr { padding-left: 20px; }
-.epic + .task + .task + .task .cell.descr { padding-left: 30px; }
-.epic + .task + .task + .task + .task .cell.descr { padding-left: 40px; }
-.epic + .task + .task + .task + .task + .task .cell.descr { padding-left: 50px; }
-.epic + .task + .task + .task + .task + .task + .task .cell.descr { padding-left: 60px; }
+.epic .task .cell.descr { padding-left: 20px; }
+.epic .task .task .cell.descr { padding-left: 40px; }
+.epic .task .task .task .cell.descr { padding-left: 60px; }
+.epic .task .task .task .task .cell.descr { padding-left: 80px; }
+.epic .task .task .task .task .task .cell.descr { padding-left: 1000px; }
+.epic .task .task .task .task .task .task .cell.descr { padding-left: 1200px; }
 
-.row:not(:has(input:checked)) + .task { display: none !important; }
+/* .row:not(:has(input:checked)) + .task { display: none !important; }
 .row:not(:has(input:checked)) + .task + .task { display: none !important; }
 .row:not(:has(input:checked)) + .task + .task + .task { display: none !important; }
 .row:not(:has(input:checked)) + .task + .task + .task + .task { display: none !important; }
-.row:not(:has(input:checked)) + .task + .task + .task + .task + .task { display: none !important; }
+.row:not(:has(input:checked)) + .task + .task + .task + .task + .task { display: none !important; } */
 
 .cell.descr .content .arrow {
 
@@ -94,18 +115,6 @@ body {
     background: yellow;
 }
 
-.row.task {
-
-    display: none;
-}
-
-.row:has(
-input:checked
-) + .row:not(.epic) {
-
-    display: flex;
-}
-
 .v-splitter {
 
     width: 3px;
@@ -119,4 +128,9 @@ input:checked
     content: '.';
     color: transparent;
     font-size: 0;
+}
+
+.text:blur {
+
+    outline: none
 }

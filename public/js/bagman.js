@@ -21,44 +21,71 @@ let roadmap = $('<div>')
 .appendTo('body')
 
 
-let Row = function(epic) {
+let TaskRow = function(parentTask) {
+
+    this.appendSubTask = (subTask) => {
+
+        children.append(subTask.$);
+    };
 
 
     let row = $('<div>')
     .addClass('row')
-    .addClass(epic ? 'epic' : 'task')
-    .appendTo(roadmap)
+    .addClass(parentTask ? 'task' : 'epic')
 
-    let cell = $('<div>')
-    .addClass('cell')
-    .addClass('descr')
+    this.$ = row;
+
+    if(parentTask)
+        parentTask.appendSubTask(this)
+    else
+        row.appendTo(roadmap);
+
+    let header = $('<div>')
+    .addClass('header')
     .appendTo(row)
 
-    let content = $('<label>')
+    let children = $('<div>')
+    .addClass('children')
+    .appendTo(row)
+
+    let descr = $('<div>')
+    .addClass('cell')
+    .addClass('descr')
+    .appendTo(header)
+
+    let content = $('<div>')
     .addClass('content')
-    .append()
-    .appendTo(cell)
+    .appendTo(descr)
 
     $('<input>')
     .attr('type', 'checkbox')
     .appendTo(content);
 
-    $('<div>')
-    .addClass('arrow')
-    .attr('type', 'checkbox')
-    .appendTo(content);
-
     let text = $('<div>')
     .addClass('text')
-    .text('Hello, white man! I love you!')
-    .append()
+    .text('Hello, I\'m an awful text. Try resize me!')
+    .attr('contenteditable', true)
     .appendTo(content)
+    .on('keydown', function(e) {
+
+        const codeEnter = 13;
+
+        if(e.keyCode == codeEnter) {
+
+            console.log($(this).text());
+            e.preventDefault();
+
+            $(this).blur();
+
+            window.getSelection().removeAllRanges();
+        }
+    });
 
 
     $('<div>')
     .addClass('cell')
     .addClass('v-splitter')
-    .appendTo(row)
+    .appendTo(header)
     .on('selectstart', (e) => {
 
         e.preventDefault();
@@ -112,9 +139,24 @@ let Row = function(epic) {
 
 for(let i=0; i<10; ++i) {
 
-    new Row(true);
-    new Row(false);
-    new Row(false);
-    new Row(false);
-    new Row(false);
+    let epic = new TaskRow();
+    let task, subtask;
+
+    task = new TaskRow(epic);
+    subtask = new TaskRow(task);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
+
+    task = new TaskRow(epic);
+    subtask = new TaskRow(task);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
+
+    task = new TaskRow(epic);
+    subtask = new TaskRow(task);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
+    new TaskRow(subtask);
 }
