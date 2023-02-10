@@ -21,12 +21,12 @@ let roadmap = $('<div>')
 .appendTo('body')
 
 
-let Row = function() {
+let Row = function(epic) {
 
 
     let row = $('<div>')
     .addClass('row')
-    .addClass('epic')
+    .addClass(epic ? 'epic' : 'task')
     .appendTo(roadmap)
 
     let cell = $('<div>')
@@ -34,12 +34,16 @@ let Row = function() {
     .addClass('descr')
     .appendTo(row)
 
-    let content = $('<div>')
+    let content = $('<label>')
     .addClass('content')
     .append()
     .appendTo(cell)
 
     $('<input>')
+    .attr('type', 'checkbox')
+    .appendTo(content);
+
+    $('<div>')
     .addClass('arrow')
     .attr('type', 'checkbox')
     .appendTo(content);
@@ -72,6 +76,7 @@ let Row = function() {
         };
 
         let initWidth = descrWidth;
+        let currentWidth;
 
         let mouseMove = (e) => {
 
@@ -89,11 +94,13 @@ let Row = function() {
                 )
                 : 100;
             setDescrColWidth(currentPos);
+            currentWidth = currentPos;
         };
 
         let mouseUp = (e) => {
 
             mouseMove(e);
+            descrWidth = currentWidth;
             $(window).off('mousemove', mouseMove);
             $(window).off('mouseup', mouseUp);
         };
@@ -103,5 +110,11 @@ let Row = function() {
     })
 };
 
-for(let i=0; i<10; ++i)
-    new Row();
+for(let i=0; i<10; ++i) {
+
+    new Row(true);
+    new Row(false);
+    new Row(false);
+    new Row(false);
+    new Row(false);
+}

@@ -19,15 +19,20 @@ body {
     background: #c2d3e2;
 }
 
+.task {
+
+    border-top: solid 1px #1a4267;;
+}
+
 .epic:not(:first-child) {
 
-    border-top: solid 1px red;
+    border-top: solid 1px #47729b;;
 }
 
-.epic:nth-of-type(even) {
+/* .epic:nth-of-type(even) {
 
     background: #71a0cc;
-}
+} */
 
 .row {
     
@@ -37,6 +42,7 @@ body {
 .cell {
 
     display: block;
+    box-sizing: border-box;
 
 }
 
@@ -46,9 +52,58 @@ body {
     display: flex;
 }
 
+.cell.descr .content input {
+
+    /* visibility: hidden; */
+    /* display: none; */
+    margin-right: 10px;
+}
+
+.row:not(:has(+ .task)) .content input {
+
+    visibility: hidden;
+}
+
+.epic + .task .cell.descr { padding-left: 10px; }
+.epic + .task + .task .cell.descr { padding-left: 20px; }
+.epic + .task + .task + .task .cell.descr { padding-left: 30px; }
+.epic + .task + .task + .task + .task .cell.descr { padding-left: 40px; }
+.epic + .task + .task + .task + .task + .task .cell.descr { padding-left: 50px; }
+.epic + .task + .task + .task + .task + .task + .task .cell.descr { padding-left: 60px; }
+
+.row:not(:has(input:checked)) + .task { display: none !important; }
+.row:not(:has(input:checked)) + .task + .task { display: none !important; }
+.row:not(:has(input:checked)) + .task + .task + .task { display: none !important; }
+.row:not(:has(input:checked)) + .task + .task + .task + .task { display: none !important; }
+.row:not(:has(input:checked)) + .task + .task + .task + .task + .task { display: none !important; }
+
 .cell.descr .content .arrow {
 
     margin-right: 10px;
+    display: inline-block;
+    background: transparent;
+    border: solid 1px red;
+    width: 10px;
+    height: 10px;
+    border-radius: 0 0 10px 10px;
+    display: none;
+}
+
+.cell.descr .content input:checked ~ .arrow {
+
+    background: yellow;
+}
+
+.row.task {
+
+    display: none;
+}
+
+.row:has(
+input:checked
+) + .row:not(.epic) {
+
+    display: flex;
 }
 
 .v-splitter {
