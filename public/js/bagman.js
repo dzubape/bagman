@@ -16,18 +16,65 @@ let setDescrColWidth = (width) => {
 
 setDescrColWidth(descrWidth)
 
-let roadmap = $('<div>')
+let roadmapBox = $('<div>')
 .addClass('roadmap')
 .appendTo('body')
+
+
+let HeaderRow = function() {
+
+    this.appendSubTask = (subTask) => {
+
+        childBox.append(subTask.$);
+    };
+
+    let row = $('<div>')
+    .addClass('row')
+    .addClass('header')
+
+    this.$ = row;
+    row.appendTo(roadmapBox);
+
+    let parentBox = $('<div>')
+    .addClass('parent-box')
+    .appendTo(row)
+
+    let childBox = $('<div>')
+    .addClass('child-box')
+    .appendTo(row)
+
+    let epicAppendor = $('<div>')
+    .addClass('epic-appendor')
+    .appendTo(row)
+
+    let descr = $('<div>')
+    .addClass('cell')
+    .addClass('descr')
+    .appendTo(parentBox)
+
+    let content = $('<div>')
+    .addClass('content')
+    .appendTo(descr)
+
+    let text = $('<div>')
+    .addClass('text')
+    .text('Task description')
+    .appendTo(content)
+
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('v-splitter')
+    .appendTo(parentBox)  
+};
 
 
 let TaskRow = function(parentTask) {
 
     this.appendSubTask = (subTask) => {
 
-        children.append(subTask.$);
+        childBox.append(subTask.$);
     };
-
 
     let row = $('<div>')
     .addClass('row')
@@ -35,23 +82,20 @@ let TaskRow = function(parentTask) {
 
     this.$ = row;
 
-    if(parentTask)
-        parentTask.appendSubTask(this)
-    else
-        row.appendTo(roadmap);
+    (parentTask || roadmap).appendSubTask(this);
 
-    let header = $('<div>')
-    .addClass('header')
+    let parentBox = $('<div>')
+    .addClass('parent-box')
     .appendTo(row)
 
-    let children = $('<div>')
-    .addClass('children')
+    let childBox = $('<div>')
+    .addClass('child-box')
     .appendTo(row)
 
     let descr = $('<div>')
     .addClass('cell')
     .addClass('descr')
-    .appendTo(header)
+    .appendTo(parentBox)
 
     let content = $('<div>')
     .addClass('content')
@@ -85,7 +129,7 @@ let TaskRow = function(parentTask) {
     $('<div>')
     .addClass('cell')
     .addClass('v-splitter')
-    .appendTo(header)
+    .appendTo(parentBox)
     .on('selectstart', (e) => {
 
         e.preventDefault();
@@ -115,9 +159,9 @@ let TaskRow = function(parentTask) {
             let currentPos = initWidth + mouseMovePos.x - mousePressPos.x;
 
             currentPos = currentPos > 100
-                ? (currentPos < roadmap.width() - minTimelineWidth
+                ? (currentPos < roadmapBox.width() - minTimelineWidth
                     ? currentPos
-                    : roadmap.width() - minTimelineWidth
+                    : roadmapBox.width() - minTimelineWidth
                 )
                 : 100;
             setDescrColWidth(currentPos);
@@ -136,6 +180,8 @@ let TaskRow = function(parentTask) {
         $(window).mouseup(mouseUp);
     })
 };
+
+let roadmap = new HeaderRow();
 
 for(let i=0; i<10; ++i) {
 

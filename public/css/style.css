@@ -40,7 +40,7 @@ body {
     display: block;
 }
 
-.header {
+.parent-box {
     
     display: flex;
 }
@@ -70,17 +70,17 @@ body {
     /* visibility: hidden; */
 }
 
-.row:has(> .header input:checked) >  .children {
+.row:has(> .parent-box input:checked) >  .child-box {
 
     display: block;
 }
 
-.row:not(:has(> .header input:checked)) .children {
+.row:not(.header):not(:has(> .parent-box input:checked)) .child-box {
 
     display: none;
 }
 
-.row:not(:has(> .children > .row)) > .header input {
+.row:not(:has(> .child-box > .row)) > .parent-box input {
 
     visibility: hidden;
 }
@@ -133,4 +133,9 @@ body {
 .text:blur {
 
     outline: none
+}
+
+.epic-appendor {
+
+
 }
