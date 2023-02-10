@@ -105,6 +105,7 @@ let FooterRow = function() {
         console.log('add epic');
 
         new TaskRow();
+        // saveModel();
     })
 
     $('<div>')
@@ -114,32 +115,13 @@ let FooterRow = function() {
     .mousedown(onSplitterMove)
 };
 
-//
-// Demo: Circular reference
-var circ = {};
-circ.circ = circ;
-
-// Note: cache should not be re-used by repeated calls to JSON.stringify.
-var cache = [];
-JSON.stringify(circ, (key, value) => {
-  if (typeof value === 'object' && value !== null) {
-    // Duplicate reference found, discard key
-    if (cache.includes(value)) return;
-
-    // Store value in our collection
-    cache.push(value);
-  }
-  return value;
-});
-cache = null; // Enable garbage collection
-//
-
 let modelWithoutParent = (task) => {
 
     let m = {
         descr: task.descr,
         start: task.start,
         duration: task.duration,
+        unrolled: task.unrolled,
         subtasks: [],
     };
 
@@ -203,6 +185,7 @@ let TaskRow = function(parentTask) {
         descr: initialDescr,
         start: null,
         duration: null,
+        unrolled: false,
         subtasks: [],
         parent: null,
     };
@@ -250,11 +233,13 @@ let TaskRow = function(parentTask) {
     this.unRoll = () => {
 
         openarrow.prop('checked', true);
+        this.model.unrolled = true;
     };
 
     this.collapse = () => {
 
         openarrow.prop('checked', false);
+        this.model.unrolled = false;
     };
 
     let row = $('<div>')
@@ -284,7 +269,11 @@ let TaskRow = function(parentTask) {
 
     let openarrow = $('<input>')
     .attr('type', 'checkbox')
-    .appendTo(content);
+    .appendTo(content)
+    .click((e) => {
+
+        this.model.unrolled = !this.model.unrolled;
+    });
 
     let text = $('<div>')
     .addClass('text')
@@ -300,7 +289,7 @@ let TaskRow = function(parentTask) {
         if(e.keyCode == codeEnter) {
 
             this.model.descr = text.text();
-            saveModel();
+            // saveModel();
 
             console.log(text.text());
             e.preventDefault();
@@ -323,7 +312,7 @@ let TaskRow = function(parentTask) {
     .blur((e) => {
 
         this.model.descr = text.text();
-        saveModel();
+        // saveModel();
 
         console.log(text.text());
         e.preventDefault();
@@ -348,6 +337,7 @@ let TaskRow = function(parentTask) {
     
             let task = new TaskRow(this);
             this.unRoll();
+            // saveModel();
         })
     )
     .append(
@@ -394,7 +384,7 @@ let footer = new FooterRow();
 let saveModel = () => {
 
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
-    console.log(roadmapModel);
+    console.log('saveModel:', roadmapModel);
 
     localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
 };
@@ -411,6 +401,11 @@ let buildBranch = (taskCtrl, taskModel) => {
         subTaskCtrl.setDescription(subTaskModel.descr);
         subTaskCtrl.setStart(subTaskModel.start);
         subTaskCtrl.setDuration(subTaskModel.duration);
+        subTaskCtrl[
+            subTaskModel.unrolled
+            ? 'unRoll'
+            : 'collapse'
+        ]();
 
         buildBranch(subTaskCtrl, subTaskModel);
     }
@@ -429,3 +424,8 @@ let loadModel = () => {
 };
 
 loadModel();
+
+$(window).on('unload', (e) => {
+
+    saveModel();
+})
