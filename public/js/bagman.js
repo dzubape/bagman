@@ -6,21 +6,29 @@ const minTimelineWidth = 200;
 const minDescrColWidth = 100;
 let descriptionColumnWidth = minDescrColWidth;
 
+let viewSettings = {
+    descriptionColumnWidth: minDescrColWidth,
+
+}
+
 let interStyle = new function() {
 
     let $style = $('<style>')
     .appendTo('head');
 
     let s = {
-        descriptionWidth: minDescrColWidth,
+        descriptionColumnWidth: minDescrColWidth,
+        durationColumnWidth: 100,
     };
 
-    let update = () => {
+    this.d = s;
+
+    this.update = () => {
 
         style = `
 .cell.descr {
 
-    width: ${s.descriptionWidth}px;
+    width: ${s.descriptionColumnWidth}px;
 }
         `;
         $style.text(style);
@@ -31,12 +39,18 @@ let interStyle = new function() {
 
     this.descriptionColumnWidth = (width) => {
 
-        s.descriptionWidth = width;
-        update();
-    }
+        s.descriptionColumnWidth = width;
+        this.update();
+    };
+
+    this.durationColumnWidth = (width) => {
+
+        s.durationColumnWidth = width;
+        this.update();
+    };
 }();
 
-interStyle.descriptionColumnWidth(descriptionColumnWidth);
+interStyle.update();
 
 
 let roadmapBox = $('<div>')
@@ -166,7 +180,7 @@ let onSplitterMove = (e) => {
         y: e.originalEvent.screenY,
     };
 
-    let initWidth = descriptionColumnWidth;
+    let initWidth = interStyle.d.descriptionColumnWidth;
     let currentWidth;
 
     let mouseMove = (e) => {
@@ -191,7 +205,7 @@ let onSplitterMove = (e) => {
     let mouseUp = (e) => {
 
         mouseMove(e);
-        descriptionColumnWidth = currentWidth;
+        // descriptionColumnWidth = currentWidth;
         $(window).off('mousemove', mouseMove);
         $(window).off('mouseup', mouseUp);
     };
@@ -406,9 +420,10 @@ let TaskRow = function(parentTask) {
     .addClass('cell')
     .appendTo(parentBox)
     .append(
-        $('<div>')
+        $('<input>')
+        .prop('type', 'number')
         .addClass('duration')
-        .text('1day')
+        .val('1')
     )
 
     $('<div>')
@@ -421,13 +436,15 @@ let roadmapCtrl = new HeaderRow();
 let footer = new FooterRow();
 
 let saveModel = () => {}
+// let saveModel = () => {saveModelOnUnload()}
+
 let saveModelOnUnload = () => {
 
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
 
     let settings = {
-        descriptionColumnWidth,
+        descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
     };
 
     console.log(settings);
@@ -471,6 +488,7 @@ let loadModel = () => {
     buildBranch(roadmapCtrl, roadmapModel);
 
     let settings = localStorage.getItem('roadmapSettings');
+    console.log("settings:", settings);
     if(settings) {
 
         settings = JSON.parse(settings);
