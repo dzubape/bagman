@@ -5,6 +5,11 @@ div {
     padding: 0;
 }
 
+* {
+
+    font-family: Roboto, "Droid Sans";
+}
+
 body {
     padding: 10px;
 }
@@ -12,7 +17,9 @@ body {
 .roadmap {
 
     background: #71a0cc;
+    background: transaprent;
     color: #021324;
+    font-size: 15px;
 }
 
 .roadmap .header > .parent {
@@ -33,6 +40,7 @@ body {
 
 .task {
 
+    background: #fff;
     background: #71a0cc;
 }
 
@@ -75,6 +83,7 @@ body {
 
     padding: 5px 10px;
     display: flex;
+    align-items: center;
 }
 
 .cell.descr .content input {
@@ -150,10 +159,10 @@ body {
     font-size: 0;
 }
 
-.text:blur {
+/* .text:blur {
 
     outline: none
-}
+} */
 
 .epic-appendor {
 

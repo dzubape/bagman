@@ -3,19 +3,41 @@
 import $ from 'jquery';
 
 const minTimelineWidth = 200;
-const minDescrColWidth = 200;
-let descriptionColumnWidth = 2 * minDescrColWidth;
+const minDescrColWidth = 100;
+let descriptionColumnWidth = minDescrColWidth;
 
-let style = $('<style>')
-.appendTo('head');
+let interStyle = new function() {
 
-let setDescrColWidth = (width) => {
+    let $style = $('<style>')
+    .appendTo('head');
 
-    style.text(`.cell.descr { width: ${width}px; }`);
-    descriptionColumnWidth = width;
-};
+    let s = {
+        descriptionWidth: minDescrColWidth,
+    };
 
-setDescrColWidth(descriptionColumnWidth)
+    let update = () => {
+
+        style = `
+.cell.descr {
+
+    width: ${s.descriptionWidth}px;
+}
+        `;
+        $style.text(style);
+        
+        // (function(){/**
+        // **/}).toString().slice(15,-5);
+    };
+
+    this.descriptionColumnWidth = (width) => {
+
+        s.descriptionWidth = width;
+        update();
+    }
+}();
+
+interStyle.descriptionColumnWidth(descriptionColumnWidth);
+
 
 let roadmapBox = $('<div>')
 .addClass('roadmap')
@@ -162,7 +184,7 @@ let onSplitterMove = (e) => {
                 : roadmapBox.width() - minTimelineWidth
             )
             : 100;
-        setDescrColWidth(currentPos);
+        interStyle.descriptionColumnWidth(currentPos);
         currentWidth = currentPos;
     };
 
@@ -379,12 +401,27 @@ let TaskRow = function(parentTask) {
         return false;
     })
     .mousedown(onSplitterMove)
+
+    $('<div>')
+    .addClass('cell')
+    .appendTo(parentBox)
+    .append(
+        $('<div>')
+        .addClass('duration')
+        .text('1day')
+    )
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('v-splitter')
+    .appendTo(parentBox)
 };
 
 let roadmapCtrl = new HeaderRow();
 let footer = new FooterRow();
 
-let saveModel = () => {
+let saveModel = () => {}
+let saveModelOnUnload = () => {
 
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
@@ -437,7 +474,7 @@ let loadModel = () => {
     if(settings) {
 
         settings = JSON.parse(settings);
-        setDescrColWidth(settings.descriptionColumnWidth)
+        interStyle.descriptionColumnWidth(settings.descriptionColumnWidth)
     }
 };
 
@@ -448,4 +485,4 @@ loadModel();
 //     saveModel();
 // })
 
-addEventListener('unload', saveModel);
+addEventListener('unload', saveModelOnUnload);
