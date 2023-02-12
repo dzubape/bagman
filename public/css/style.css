@@ -86,29 +86,29 @@ body {
     align-items: center;
 }
 
-.cell.descr .content input {
+.cell.descr .content .openarrow {
 
     /* visibility: hidden; */
     /* display: none; */
     margin-right: 10px;
 }
 
-.row:not(:has(+ .task)) .content input {
+.row:not(:has(+ .task)) .content .openarrow {
 
     /* visibility: hidden; */
 }
 
-.row:has(> .parent-box input:checked) >  .child-box {
+.row:has(> .parent-box .openarrow:checked) >  .child-box {
 
     display: block;
 }
 
-.row:not(.header):not(:has(> .parent-box input:checked)) .child-box {
+.row:not(.header):not(:has(> .parent-box :checked)) .child-box {
 
     display: none;
 }
 
-.row:not(:has(> .child-box > .row)) > .parent-box input {
+.row:not(:has(> .child-box > .row)) > .parent-box .openarrow {
 
     visibility: hidden;
 }
@@ -223,6 +223,7 @@ body {
     flex: auto;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
 }
 
 .task-tool-box .button {
@@ -257,3 +258,22 @@ body {
     color: #f00000;
 }
 
+.cell.duration {
+
+    /* width: 120pxr; */
+}
+
+.cell.duration input {
+
+    width: 40px;
+    height: 100%;
+    text-align: right;
+    vertical-align: middle;
+    box-sizing: border-box;
+    border: none;
+}
+
+.cell.duration input:not(:first-child) {
+
+    border-left: solid 1px #e2e2e2;
+}

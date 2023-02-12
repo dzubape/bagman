@@ -266,7 +266,6 @@ let TaskRow = function(parentTask) {
         let root = this.model;
         while(root.parent)
             root = root.parent;
-        console.log(root);
     };
 
     this.unRoll = () => {
@@ -307,6 +306,7 @@ let TaskRow = function(parentTask) {
     .appendTo(descr)
 
     let openarrow = $('<input>')
+    .addClass('openarrow')
     .attr('type', 'checkbox')
     .appendTo(content)
     .click((e) => {
@@ -393,7 +393,7 @@ let TaskRow = function(parentTask) {
         })
     )
 
-
+    /*
     $('<div>')
     .addClass('appendor-box-med')
     .appendTo(parentBox)
@@ -401,7 +401,7 @@ let TaskRow = function(parentTask) {
         $('<div>')
         .addClass('append-button')
     )
-
+    */
 
     $('<div>')
     .addClass('cell')
@@ -414,16 +414,65 @@ let TaskRow = function(parentTask) {
 
         return false;
     })
-    .mousedown(onSplitterMove)
+    .on('mousedown', onSplitterMove)
 
+    let parseTime = () => {
+
+        let minutes = parseInt($minutes.val());
+        let hours = parseInt($hours.val());
+        let days = parseInt($days.val());
+
+        if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
+
+            let val = (days * shiftSize + hours) * 60 + minutes;
+            minutes = val % 60;
+            val -= minutes;
+            hours = val / 60;
+            val = hours;
+            hours = hours % shiftSize;
+            val -= hours;
+            days = val / shiftSize;
+
+            $minutes.val(minutes);
+            $hours.val(hours);
+            $days.val(days);
+        }
+    };
+
+    let $days, $hours, $minutes;
+    let shiftSize = 8; // hours
     $('<div>')
     .addClass('cell')
+    .addClass('duration')
     .appendTo(parentBox)
     .append(
-        $('<input>')
+        $days = $('<input>')
+        .addClass('days')
         .prop('type', 'number')
-        .addClass('duration')
-        .val('1')
+        .prop('min', -1)
+        .prop('step', 1)
+        .val('0')
+        .on('change', parseTime)
+    )
+    .append(
+        $hours = $('<input>')
+        .addClass('hours')
+        .prop('type', 'number')
+        .prop('min', -1)
+        .prop('max', 8)
+        .prop('step', 1)
+        .val('0')
+        .on('change', parseTime)
+    )
+    .append(
+        $minutes = $('<input>')
+        .addClass('minutes')
+        .prop('type', 'number')
+        .prop('min', -10)
+        .prop('max', 60)
+        .prop('step', 10)
+        .val('0')
+        .on('change', parseTime)
     )
 
     $('<div>')
@@ -454,8 +503,6 @@ let saveModelOnUnload = () => {
 };
 
 let buildBranch = (taskCtrl, taskModel) => {
-
-    console.log('buildBranch:', taskModel);
 
     for(let i=0; i<taskModel.subtasks.length; ++i) {
 
@@ -497,10 +544,5 @@ let loadModel = () => {
 };
 
 loadModel();
-
-// $(window).on('unload', (e) => {
-
-//     saveModel();
-// })
 
 addEventListener('unload', saveModelOnUnload);
