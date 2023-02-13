@@ -424,6 +424,8 @@ let TaskRow = function(parentTask) {
 
         if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
 
+            minutes = Math.round(minutes / 10) * 10;
+
             let val = (days * shiftSize + hours) * 60 + minutes;
             minutes = val % 60;
             val -= minutes;
@@ -433,9 +435,14 @@ let TaskRow = function(parentTask) {
             val -= hours;
             days = val / shiftSize;
 
+            console.log('minutes:', minutes);
             $minutes.val(minutes);
             $hours.val(hours);
             $days.val(days);
+        }
+        else if(minutes != Math.round(minutes / 10) * 10) {
+
+            $minutes.val(Math.round(minutes / 10) * 10);
         }
     };
 
