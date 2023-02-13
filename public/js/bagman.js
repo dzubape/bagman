@@ -402,6 +402,7 @@ let TaskRow = function(parentTask) {
         $('<div>')
         .addClass('button')
         .addClass('task-appendor')
+        .prop('title', 'Add subtask')
         .html('&#8600;')
         .html('&#65291;')
         .html('&#11175;')
@@ -417,12 +418,13 @@ let TaskRow = function(parentTask) {
         $('<div>')
         .addClass('button')
         .addClass('task-remover')
+        .prop('title', 'Remove task tree')
         .html('&#10005;')
         .html('	&#8855;')
         .html('	&#9746;')
         .click(() => {
     
-            if(confirm(`Remove task ${this.model.descr}`))
+            if(confirm(`Remove task ${this.model.descr}?`))
                 this.remove();
         })
     )
