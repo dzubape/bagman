@@ -143,7 +143,7 @@ let FooterRow = function() {
         console.log('add epic');
 
         new TaskRow(roadmapCtrl);
-        saveModel();
+        saveCurrentModel();
     })
 
     $('<div>')
@@ -254,7 +254,7 @@ let TaskRow = function(parentTask) {
         s.splice(idx, 1);
         this.$.remove();
 
-        saveModel();
+        saveCurrentModel();
     };
 
     this.appendSubTask = (subTask) => {
@@ -328,7 +328,7 @@ let TaskRow = function(parentTask) {
         if(e.keyCode == codeEnter) {
 
             this.model.descr = text.text();
-            saveModel();
+            saveCurrentModel();
 
             console.log(text.text());
             e.preventDefault();
@@ -351,7 +351,7 @@ let TaskRow = function(parentTask) {
     .blur((e) => {
 
         this.model.descr = text.text();
-        saveModel();
+        saveCurrentModel();
 
         console.log(text.text());
         e.preventDefault();
@@ -376,7 +376,7 @@ let TaskRow = function(parentTask) {
     
             let task = new TaskRow(this);
             this.unRoll();
-            saveModel();
+            saveCurrentModel();
         })
     )
     .append(
@@ -484,10 +484,10 @@ let TaskRow = function(parentTask) {
 let roadmapCtrl = new HeaderRow();
 let footer = new FooterRow();
 
-let saveModel = () => {}
-// let saveModel = () => {saveModelOnUnload()}
+let saveModelOnUnload = () => {saveModel()};
+let saveCurrentModel = () => {};
 
-let saveModelOnUnload = () => {
+let saveModel = () => {
 
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
