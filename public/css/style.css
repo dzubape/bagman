@@ -91,6 +91,7 @@ body {
     /* visibility: hidden; */
     /* display: none; */
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .row:not(:has(+ .task)) .content .openarrow {
@@ -231,16 +232,17 @@ body {
     margin-left: 3px;
     font-size: 20px;
     cursor: pointer;
-    border: solid 1px #ccc;
-    background: #acc0cb;
+    /* border: solid 1px #ccc; */
+    /* background: #acc0cb; */
     padding: 0 3px;
     border-radius: 3px;
-    transition: color .1s;
+    transition: color .07s;
 }
 
 .task-tool-box .button.task-appendor  {
-
-    color: #375b07;
+    
+    color: #355d00;
+    text-shadow: 0 0 1px #fff;
 }
 
 .task-tool-box .button.task-appendor:hover  {
@@ -258,11 +260,7 @@ body {
     color: #f00000;
 }
 
-.cell.duration {
-
-    /* width: 120pxr; */
-}
-
+.cell.duration .title,
 .cell.duration input {
 
     width: 40px;
@@ -276,4 +274,22 @@ body {
 .cell.duration input:not(:first-child) {
 
     border-left: solid 1px #e2e2e2;
+}
+
+.cell.duration .title:not(:first-child) {
+
+    border-left: solid 1px #416a8d;
+}
+
+.cell.duration .title {
+
+    display: inline-block;
+}
+
+.cell.duration .title div {
+
+    writing-mode: vertical-rl;
+    /* text-orientation: mixed; */
+    display: block;
+    padding: 10px;
 }

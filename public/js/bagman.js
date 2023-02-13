@@ -105,6 +105,40 @@ let HeaderRow = function() {
     .addClass('v-splitter')
     .appendTo(parentBox)  
     .mousedown(onSplitterMove)
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('duration')
+    .appendTo(parentBox)
+    .append(
+        $days = $('<div>')
+        .addClass('title')
+        .append(
+            $('<div>')
+            .text('Days')
+        )
+    )
+    .append(
+        $days = $('<div>')
+        .addClass('title')
+        .append(
+            $('<div>')
+            .text('Hours')
+        )
+    )
+    .append(
+        $days = $('<div>')
+        .addClass('title')
+        .append(
+            $('<div>')
+            .text('Minutes')
+        )
+    )
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('v-splitter')
+    .appendTo(parentBox)
 };
 
 let FooterRow = function() {
@@ -447,7 +481,7 @@ let TaskRow = function(parentTask) {
     };
 
     let $days, $hours, $minutes;
-    let shiftSize = 8; // hours
+    const shiftSize = 8; // hours
     $('<div>')
     .addClass('cell')
     .addClass('duration')
