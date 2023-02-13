@@ -464,11 +464,19 @@ let TaskRow = function(parentTask) {
         let hours = parseInt($duration.hours.val());
         let days = parseInt($duration.days.val());
 
-        if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
+        minutes = Math.round(minutes / 10) * 10;
+        let val = (days * shiftSize + hours) * 60 + minutes;
+        
+        if(val < 0) {
+         
+            days = 0;
+            hours = 0;
+            minutes = 0;
+        }
+        else if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
 
-            minutes = Math.round(minutes / 10) * 10;
 
-            let val = (days * shiftSize + hours) * 60 + minutes;
+            console.log('val:', val);
             minutes = val % 60;
             val -= minutes;
             hours = val / 60;
@@ -477,10 +485,6 @@ let TaskRow = function(parentTask) {
             val -= hours;
             days = val / shiftSize;
 
-            // $duration.minutes.val(minutes);
-            // $duration.hours.val(hours);
-            // $duration.days.val(days);
-
             this.setDuration({days, hours, minutes});
         }
         else if(minutes != Math.round(minutes / 10) * 10) {
@@ -488,9 +492,7 @@ let TaskRow = function(parentTask) {
             $duration.minutes.val(Math.round(minutes / 10) * 10);
         }
 
-        this.model.duration.days = days;
-        this.model.duration.hours = hours;
-        this.model.duration.minutes = minutes;
+        this.setDuration({days, hours, minutes});
     };
 
     let $duration = {
