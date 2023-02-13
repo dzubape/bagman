@@ -192,6 +192,7 @@ let modelWithoutParent = (task) => {
     let m = {
         descr: task.descr,
         start: task.start,
+        // duration: {days: 0, hours: 0, minutes: 0},
         duration: task.duration,
         unrolled: task.unrolled,
         subtasks: [],
@@ -257,7 +258,7 @@ let TaskRow = function(parentTask) {
     this.model = {
         descr: initialDescr,
         start: null,
-        duration: null,
+        duration: {days: 0, hours: 0, minutes: 0},
         unrolled: false,
         subtasks: [],
         parent: null,
@@ -278,7 +279,10 @@ let TaskRow = function(parentTask) {
     this.setDuration = (duration) => {
 
         this.model.duration = duration;
-        //! view update
+
+        $duration.days.val(duration.days);
+        $duration.hours.val(duration.hours);
+        $duration.minutes.val(duration.minutes);
     };
 
     this.remove = () => {
@@ -424,7 +428,7 @@ let TaskRow = function(parentTask) {
         .html('	&#9746;')
         .click(() => {
     
-            if(confirm(`Remove task ${this.model.descr}?`))
+            if(confirm(`Remove task "${this.model.descr}"?`))
                 this.remove();
         })
     )
@@ -454,9 +458,11 @@ let TaskRow = function(parentTask) {
 
     let parseTime = () => {
 
-        let minutes = parseInt($minutes.val());
-        let hours = parseInt($hours.val());
-        let days = parseInt($days.val());
+        const shiftSize = 8;
+
+        let minutes = parseInt($duration.minutes.val());
+        let hours = parseInt($duration.hours.val());
+        let days = parseInt($duration.days.val());
 
         if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
 
@@ -471,25 +477,34 @@ let TaskRow = function(parentTask) {
             val -= hours;
             days = val / shiftSize;
 
-            console.log('minutes:', minutes);
-            $minutes.val(minutes);
-            $hours.val(hours);
-            $days.val(days);
+            // $duration.minutes.val(minutes);
+            // $duration.hours.val(hours);
+            // $duration.days.val(days);
+
+            this.setDuration({days, hours, minutes});
         }
         else if(minutes != Math.round(minutes / 10) * 10) {
 
-            $minutes.val(Math.round(minutes / 10) * 10);
+            $duration.minutes.val(Math.round(minutes / 10) * 10);
         }
+
+        this.model.duration.days = days;
+        this.model.duration.hours = hours;
+        this.model.duration.minutes = minutes;
     };
 
-    let $days, $hours, $minutes;
+    let $duration = {
+        days: null, hours: null, minutes: null,
+    };
+
+    // let $days, $hours, $minutes;
     const shiftSize = 8; // hours
     $('<div>')
     .addClass('cell')
     .addClass('duration')
     .appendTo(parentBox)
     .append(
-        $days = $('<input>')
+        $duration.days = $('<input>')
         .addClass('days')
         .prop('type', 'number')
         .prop('min', -1)
@@ -498,7 +513,7 @@ let TaskRow = function(parentTask) {
         .on('change', parseTime)
     )
     .append(
-        $hours = $('<input>')
+        $duration.hours = $('<input>')
         .addClass('hours')
         .prop('type', 'number')
         .prop('min', -1)
@@ -508,7 +523,7 @@ let TaskRow = function(parentTask) {
         .on('change', parseTime)
     )
     .append(
-        $minutes = $('<input>')
+        $duration.minutes = $('<input>')
         .addClass('minutes')
         .prop('type', 'number')
         .prop('min', -10)
@@ -554,7 +569,7 @@ let buildBranch = (taskCtrl, taskModel) => {
         let subTaskCtrl = new TaskRow(taskCtrl);
         subTaskCtrl.setDescription(subTaskModel.descr);
         subTaskCtrl.setStart(subTaskModel.start);
-        subTaskCtrl.setDuration(subTaskModel.duration);
+        subTaskCtrl.setDuration(subTaskModel.duration || {days: 0, hours: 0, minutes: 0});
         subTaskCtrl[
             subTaskModel.unrolled
             ? 'unRoll'
