@@ -52,15 +52,121 @@ let interStyle = new function() {
 
 interStyle.update();
 
-
 let roadmapBox = $('<div>')
 .addClass('roadmap')
 .appendTo('body')
 
+let rowPrototype = new function() {
+
+    this.pingMsg = 'RowPrototype';
+    this.ping = function() {
+        
+        console.log(this.pingMsg);
+    };
+
+    this.setDuration = function(duration) {
+
+        console.warn('setDuration() is not defined in', this.constructor);
+    };
+
+    this.parseDuration = function(duration) {
+
+        let {days, hours, minutes} = duration;
+
+        minutes = Math.round(minutes / 10) * 10;
+        let val = (days * shiftSize + hours) * 60 + minutes;
+        
+        if(val < 0) {
+         
+            days = 0;
+            hours = 0;
+            minutes = 0;
+        }
+        else if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
+
+
+            console.log('val:', val);
+            minutes = val % 60;
+            val -= minutes;
+            hours = val / 60;
+            val = hours;
+            hours = hours % shiftSize;
+            val -= hours;
+            days = val / shiftSize;
+
+            this.setDuration({days, hours, minutes});
+        }
+        else if(minutes != Math.round(minutes / 10) * 10) {
+
+            $duration.minutes.val(Math.round(minutes / 10) * 10);
+        }
+
+        this.setDuration({days, hours, minutes});
+        // this.pushDuration();
+        //roadmapCtrl.pullDuration();
+        this.ping();
+
+        return {days, hours, minutes};
+    };
+
+    this.getDuration = () => {
+
+        return this.model.duration;
+    };
+
+    const shiftSize = 8; // hours
+    const duration2minutes = (duration) => {
+
+        return (duration.days * shiftSize + duration.hours) * 60 + duration.minutes;
+    };
+
+    const minutes2duration = (minutes) => {
+
+        let val = minutes;
+        minutes = val % 60;
+        val -= minutes;
+        let hours = val / 60;
+        val -= hours;
+        days = val / 60;
+        return {days, hours, minutes};
+    };
+
+    this.pullDuration = () => {
+
+        const subtasks = this.model.subtasks;
+        
+        if(!subtasks.length)
+            return;
+        
+        let minutes = 0;
+        for(let i=0; i<subtasks.length; ++i) {
+
+            subtasks[i].ctrl.pullDuration();
+            minutes += duration2minutes(subtasks[i].getDuration());
+        }
+
+        this.setDuration(minutes2duration(minutes));
+    };
+
+    this.pushDuration = () => {
+
+        let minutes = duration2minutes(this.model.duration);
+
+        for(let task=this.model.parent; task; task=task.parent) {
+
+            minutes += duration2minutes(task.duration);
+            task.ctrl.setDuration(minutes2duration(minutes));
+        }
+    };
+}();
+
 
 let HeaderRow = function() {
 
+    this.pingMsg = 'HeaderRow';
+
     this.model = {
+        duration: {days: 0, hours: 0, minutes: 0},
         subtasks: [],
     };
 
@@ -69,6 +175,23 @@ let HeaderRow = function() {
         childBox.append(subTask.$);
         this.model.subtasks.push(subTask.model);
         subTask.model.parent = this.model;
+    };
+
+    this.pullDuration = () => {
+
+        const subtasks = this.model.subtasks;
+        
+        if(!subtasks.length)
+            return;
+        
+        let minutes = 0;
+        for(let i=0; i<subtasks.length; ++i) {
+
+            subtasks[i].ctrl.pullDuration();
+            minutes += duration2minutes(subtasks[i].getDuration());
+        }
+
+        this.setDuration(minutes2duration(minutes));
     };
 
     let row = $('<div>')
@@ -184,7 +307,7 @@ let FooterRow = function() {
     .addClass('cell')
     .addClass('v-splitter')
     .appendTo(parentBox)  
-    .mousedown(onSplitterMove)
+    .on('mousedown', onSplitterMove)
 };
 
 let modelWithoutParent = (task) => {
@@ -192,7 +315,6 @@ let modelWithoutParent = (task) => {
     let m = {
         descr: task.descr,
         start: task.start,
-        // duration: {days: 0, hours: 0, minutes: 0},
         duration: task.duration,
         unrolled: task.unrolled,
         subtasks: [],
@@ -245,23 +367,22 @@ let onSplitterMove = (e) => {
         $(window).off('mouseup', mouseUp);
     };
 
-    $(window).mousemove(mouseMove);
-    $(window).mouseup(mouseUp);
+    $(window).on('mousemove', mouseMove);
+    $(window).on('mouseup', mouseUp);
 };
 
 let TaskRow = function(parentTask) {
 
-    // debugger
-    // let initialDescr = 'Hello, I\'m an awful text. Try resize me!';
-    let initialDescr = "Task description";
+    this.pingMsg = 'TaskRow';
 
     this.model = {
-        descr: initialDescr,
+        descr: "Task description",
         start: null,
         duration: {days: 0, hours: 0, minutes: 0},
         unrolled: false,
         subtasks: [],
         parent: null,
+        ctrl: this,
     };
 
     this.setDescription = (descr) => {
@@ -354,7 +475,7 @@ let TaskRow = function(parentTask) {
 
     let text = $('<div>')
     .addClass('text')
-    .text(initialDescr)
+    .text(this.model.descr)
     .attr('contenteditable', true)
     .appendTo(content)
     .on('keydown', (e) => {
@@ -456,51 +577,19 @@ let TaskRow = function(parentTask) {
     })
     .on('mousedown', onSplitterMove)
 
-    let parseTime = () => {
+    const parseDuration = () => {
 
-        const shiftSize = 8;
+        let duration = {
+            minutes: parseInt($duration.minutes.val()),
+            hours: parseInt($duration.hours.val()),
+            days: parseInt($duration.days.val()),
+        };
 
-        let minutes = parseInt($duration.minutes.val());
-        let hours = parseInt($duration.hours.val());
-        let days = parseInt($duration.days.val());
-
-        minutes = Math.round(minutes / 10) * 10;
-        let val = (days * shiftSize + hours) * 60 + minutes;
-        
-        if(val < 0) {
-         
-            days = 0;
-            hours = 0;
-            minutes = 0;
-        }
-        else if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
-
-
-            console.log('val:', val);
-            minutes = val % 60;
-            val -= minutes;
-            hours = val / 60;
-            val = hours;
-            hours = hours % shiftSize;
-            val -= hours;
-            days = val / shiftSize;
-
-            this.setDuration({days, hours, minutes});
-        }
-        else if(minutes != Math.round(minutes / 10) * 10) {
-
-            $duration.minutes.val(Math.round(minutes / 10) * 10);
-        }
-
-        this.setDuration({days, hours, minutes});
+        duration = this.parseDuration(duration);
     };
 
-    let $duration = {
-        days: null, hours: null, minutes: null,
-    };
+    const $duration = {};
 
-    // let $days, $hours, $minutes;
-    const shiftSize = 8; // hours
     $('<div>')
     .addClass('cell')
     .addClass('duration')
@@ -512,7 +601,7 @@ let TaskRow = function(parentTask) {
         .prop('min', -1)
         .prop('step', 1)
         .val('0')
-        .on('change', parseTime)
+        .on('change', parseDuration)
     )
     .append(
         $duration.hours = $('<input>')
@@ -522,7 +611,7 @@ let TaskRow = function(parentTask) {
         .prop('max', 8)
         .prop('step', 1)
         .val('0')
-        .on('change', parseTime)
+        .on('change', parseDuration)
     )
     .append(
         $duration.minutes = $('<input>')
@@ -532,7 +621,7 @@ let TaskRow = function(parentTask) {
         .prop('max', 60)
         .prop('step', 10)
         .val('0')
-        .on('change', parseTime)
+        .on('change', parseDuration)
     )
 
     $('<div>')
@@ -540,6 +629,9 @@ let TaskRow = function(parentTask) {
     .addClass('v-splitter')
     .appendTo(parentBox)
 };
+
+HeaderRow.prototype = rowPrototype;
+TaskRow.prototype = rowPrototype;
 
 let roadmapCtrl = new HeaderRow();
 let footer = new FooterRow();
@@ -571,7 +663,7 @@ let buildBranch = (taskCtrl, taskModel) => {
         let subTaskCtrl = new TaskRow(taskCtrl);
         subTaskCtrl.setDescription(subTaskModel.descr);
         subTaskCtrl.setStart(subTaskModel.start);
-        subTaskCtrl.setDuration(subTaskModel.duration || {days: 0, hours: 0, minutes: 0});
+        subTaskCtrl.setDuration(subTaskModel.duration);
         subTaskCtrl[
             subTaskModel.unrolled
             ? 'unRoll'
@@ -590,8 +682,8 @@ let loadModel = () => {
     if(!roadmapModel)
         return;
 
-    console.log('loadModel:', roadmapModel);
     roadmapModel = JSON.parse(roadmapModel);
+    console.log('loadModel:', roadmapModel);
     buildBranch(roadmapCtrl, roadmapModel);
 
     let settings = localStorage.getItem('roadmapSettings');
