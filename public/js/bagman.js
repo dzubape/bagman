@@ -85,14 +85,10 @@ let RowPrototype = function() {
         else if(minutes >= 60 || minutes < 0 || hours >= shiftSize || hours < 0) {
 
 
-            console.log('val:', val);
-            minutes = val % 60;
-            val -= minutes;
-            hours = val / 60;
-            val = hours;
-            hours = hours % shiftSize;
-            val -= hours;
-            days = val / shiftSize;
+            let x = minutes2duration(val);
+            days = x.days;
+            hours = x.hours;
+            minutes = x.minutes;
 
             // this.setDuration({days, hours, minutes});
         }
@@ -115,16 +111,15 @@ let RowPrototype = function() {
         return (duration.days * shiftSize + duration.hours) * 60 + duration.minutes;
     };
 
-    const minutes2duration = (minutes) => {
+    const minutes2duration = (val) => {
 
-        let val = minutes;
-        minutes %= 60;
+        let minutes = val % 60;
         val -= minutes;
-        let hours = val / 60;
-        val = hours;
-        hours %= 60;
+        val /= 60;
+        let hours = val % shiftSize;
         val -= hours;
-        days = val / 60;
+        days = val / shiftSize;
+        console.log('min2dur:', {days, hours, minutes})
         return {days, hours, minutes};
     };
 
@@ -417,6 +412,7 @@ let TaskRow = function(parentTask) {
         let idx = s.indexOf(this.model);
         s.splice(idx, 1);
         this.$.remove();
+        roadmapCtrl.pullDuration();
 
         saveCurrentModel();
     };
@@ -539,7 +535,13 @@ let TaskRow = function(parentTask) {
         .html('	&#43;')
         .click(() => {
     
-            let task = new TaskRow(this);
+            const initialTaskSplit = !this.model.subtasks.length;
+            const task = new TaskRow(this);
+            if(initialTaskSplit) {
+
+                task.setDuration(this.getDuration());
+            }
+            
             this.unRoll();
             saveCurrentModel();
         })
