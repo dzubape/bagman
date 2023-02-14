@@ -157,6 +157,10 @@ let RowPrototype = function() {
 
         this.setDuration(duration);
     };
+
+    this.initColumns = function() {
+
+    };
 };
 
 
@@ -235,6 +239,7 @@ let HeaderRow = function() {
     .appendTo(parentBox)
     .append(
         $days = $('<div>')
+        .addClass('days')
         .addClass('title')
         .append(
             $('<div>')
@@ -243,6 +248,7 @@ let HeaderRow = function() {
     )
     .append(
         $days = $('<div>')
+        .addClass('hours')
         .addClass('title')
         .append(
             $('<div>')
@@ -251,6 +257,7 @@ let HeaderRow = function() {
     )
     .append(
         $days = $('<div>')
+        .addClass('minutes')
         .addClass('title')
         .append(
             $('<div>')
@@ -430,13 +437,13 @@ let TaskRow = function(parentTask) {
 
     this.unRoll = () => {
 
-        openarrow.prop('checked', true);
+        openchecker.prop('checked', true);
         this.model.unrolled = true;
     };
 
     this.collapse = () => {
 
-        openarrow.prop('checked', false);
+        openchecker.prop('checked', false);
         this.model.unrolled = false;
     };
 
@@ -465,14 +472,23 @@ let TaskRow = function(parentTask) {
     .addClass('content')
     .appendTo(descr)
 
-    let openarrow = $('<input>')
+    let openarrow = $('<label>')
     .addClass('openarrow')
-    .attr('type', 'checkbox')
     .appendTo(content)
+    .on('click', (e) => {
+
+        this.model.unrolled = !this.model.unrolled;
+    });
+
+    let openchecker = $('<input>')
+    .addClass('openchecker')
+    .attr('type', 'checkbox')
+    .appendTo(openarrow)
     .click((e) => {
 
         this.model.unrolled = !this.model.unrolled;
     });
+
 
     let text = $('<div>')
     .addClass('text')

@@ -86,25 +86,19 @@ body {
     align-items: center;
 }
 
-.cell.descr .content .openarrow {
+.cell.descr .content .openchecker {
 
-    /* visibility: hidden; */
-    /* display: none; */
-    margin-right: 10px;
     cursor: pointer;
+    width: 0;
+    display: none;
 }
 
-.row:not(:has(+ .task)) .content .openarrow {
-
-    /* visibility: hidden; */
-}
-
-.row:has(> .parent-box .openarrow:checked) >  .child-box {
+.row:has(> .parent-box .openchecker:checked) >  .child-box {
 
     display: block;
 }
 
-.row:not(.header):not(:has(> .parent-box :checked)) .child-box {
+.row:not(.header):not(:has(> .parent-box .openchecker:checked)) .child-box {
 
     display: none;
 }
@@ -128,21 +122,24 @@ body {
 .epic .task .task .task .task .task .cell.descr { border-left-width: 100px; }
 .epic .task .task .task .task .task .task .cell.descr { border-left-width: 120px; }
 
-.cell.descr .content .arrow {
+.cell.descr .content .openarrow {
 
-    margin-right: 10px;
-    display: inline-block;
-    background: transparent;
-    border: solid 1px red;
-    width: 10px;
-    height: 10px;
-    border-radius: 0 0 10px 10px;
-    display: none;
+    cursor: pointer;
+    padding-right: 7px;
 }
 
-.cell.descr .content input:checked ~ .arrow {
+.cell.descr .content .openarrow:before {
 
-    background: yellow;
+    content: '⮞';
+    content: '🢒';
+    font-size: 20px;
+    display: inline-block;
+    transition: transform .1s;
+}
+
+.cell.descr .content .openarrow:has(.openchecker:checked):before {
+
+    transform: rotate(90deg);
 }
 
 .v-splitter {
@@ -271,6 +268,11 @@ body {
     border: none;
 }
 
+.cell.duration .minutes {
+
+    display: none !important;
+}
+
 .cell.duration input:not(:first-child) {
 
     border-left: solid 1px #e2e2e2;
@@ -293,3 +295,23 @@ body {
     display: block;
     padding: 10px;
 }
+
+.row:has(> .child-box .row) .cell.duration input {
+
+    background: transparent;
+    border-color: #517494;
+    color: #111a23;
+}
+
+.row:not(:has(> .child-box .row)) .cell.duration input {
+
+    background: #fff;
+}
+
+/* .row:has(> .child-box .row) .cell.duration
+input[type=number]::-webkit-inner-spin-button,
+.row:has(> .child-box .row) .cell.duration
+input[type=number]::-webkit-outer-spin-button {
+
+      -webkit-appearance: none;
+} */
