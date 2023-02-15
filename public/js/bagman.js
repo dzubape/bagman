@@ -19,6 +19,8 @@ let interStyle = new function() {
     let s = {
         descriptionColumnWidth: minDescrColWidth,
         durationColumnWidth: 100,
+        shiftWidth: 50,
+        shiftPos: -50,
     };
 
     this.d = s;
@@ -30,11 +32,14 @@ let interStyle = new function() {
 
     width: ${s.descriptionColumnWidth}px;
 }
+
+.roadmap .cell.time-box .shift-box {
+
+    left: ${s.shiftPos}px;
+    width: ${s.shiftWidth}px;
+}
         `;
         $style.text(style);
-        
-        // (function(){/**
-        // **/}).toString().slice(15,-5);
     };
 
     this.descriptionColumnWidth = (width) => {
@@ -46,6 +51,18 @@ let interStyle = new function() {
     this.durationColumnWidth = (width) => {
 
         s.durationColumnWidth = width;
+        this.update();
+    };
+
+    this.shiftWidth = (width) => {
+
+        s.shiftWidth = width;
+        this.update();
+    };
+
+    this.shiftPos = (pos) => {
+
+        s.shiftPos = pos;
         this.update();
     };
 }();
@@ -67,6 +84,11 @@ let RowPrototype = function() {
     this.setDuration = function(duration) {
 
         console.warn('setDuration() is not defined in', this);
+    };
+    
+    this.setStart = function(start) {
+
+        console.warn('setStart() is not defined in', this);
     };
 
     this.formatDuration = function(duration) {
@@ -119,7 +141,6 @@ let RowPrototype = function() {
         let hours = val % this.shiftSize;
         val -= hours;
         let days = val / this.shiftSize;
-        console.log('min2dur:', {days, hours, minutes})
         return {days, hours, minutes};
     };
 
@@ -137,11 +158,30 @@ let RowPrototype = function() {
 
             let subtask = subtasks[i];
             subtask.ctrl.pullDuration();
-            console.log(subtask.ctrl.model.descr, subtask.ctrl.model.duration);
             minutes += this.duration2minutes(subtask.ctrl.getDuration());
         }
 
         this.setDuration(this.minutes2duration(minutes));
+    };
+
+    this.forwardStart = function(start) {
+
+        this.setStart(start);
+
+        const subtasks = this.model.subtasks;
+        
+        if(!subtasks.length) {
+
+            return;
+        }
+        
+        let minutes = start;
+        for(let i=0; i<subtasks.length; ++i) {
+
+            let subtask = subtasks[i];
+            subtask.ctrl.forwardStart(minutes);
+            minutes += this.duration2minutes(subtask.ctrl.getDuration());
+        }
     };
 
     this.pushDuration = function(duration) {
@@ -188,7 +228,10 @@ let HeaderRow = function() {
 
         this.model.duration = duration;
 
-        $duration.text(this.model.duration.days);
+        const minutes = this.duration2minutes(duration);
+        const days = Math.ceil(minutes / 60 / this.shiftSize);
+
+        $duration.text(days);
     };
 
     // this.pullDuration = () => {
@@ -415,7 +458,9 @@ let TaskRow = function(parentTask) {
     this.setStart = (start) => {
 
         this.model.start = start;
-        //! view update
+        
+        // debugger
+        $duration.chunk.css('left', start / 60 / this.shiftSize * 100 + '%')
     };
 
     this.setDuration = (duration) => {
@@ -427,9 +472,10 @@ let TaskRow = function(parentTask) {
         $duration.minutes.val(duration.minutes);
 
         const minutes = this.duration2minutes(duration);
-        const days = minutes / 60 / this.shiftSize; 
+        const days = minutes / 60 / this.shiftSize * 100; 
 
-        $duration.edge.css('width', days + '%');
+        $duration.chunk.css('width', days + '%');
+
     };
 
     this.remove = () => {
@@ -684,10 +730,29 @@ let TaskRow = function(parentTask) {
         $('<div>')
         .addClass('shift-box')
         .append(
-            $duration.edge = $('<div>')
+            $duration.chunk = $('<div>')
             .addClass('chunk')
         )
     )
+    .on('wheel', (e) => {
+
+        if(e.shiftKey) {
+
+            const k = 1.1;
+            const scale = e.originalEvent.deltaY > 0 ? k : 1 / k;
+            interStyle.shiftWidth(interStyle.d.shiftWidth * scale);
+        }
+        else {
+
+            let delta = 50;
+            delta = e.originalEvent.deltaY > 0 ? delta : -delta;
+            let pos = interStyle.d.shiftPos + delta;
+            pos = pos < 0 ? pos : 0;
+            interStyle.shiftPos(pos);
+        }
+        e.stopPropagation();
+        return false;
+    })
 };
 
 let rowPrototype = new RowPrototype();
@@ -710,6 +775,8 @@ let saveModel = () => {
 
     let settings = {
         descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
+        shiftPos: interStyle.d.shiftPos,
+        shiftWidth: interStyle.d.shiftWidth,
     };
 
     console.log(settings);
@@ -750,13 +817,17 @@ let loadModel = () => {
     console.log('loadModel:', roadmapModel);
     buildBranch(roadmapCtrl, roadmapModel);
     roadmapCtrl.pullDuration();
+    roadmapCtrl.forwardStart(0);
 
     let settings = localStorage.getItem('roadmapSettings');
     console.log("settings:", settings);
     if(settings) {
 
         settings = JSON.parse(settings);
+        console.log(settings);
         interStyle.descriptionColumnWidth(settings.descriptionColumnWidth)
+        interStyle.shiftPos(settings.shiftPos)
+        interStyle.shiftWidth(settings.shiftWidth)
     }
 };
 

@@ -27,6 +27,11 @@ body {
     color: #071d30;
 }
 
+.roadmap .row.header > .parent-box .content {
+
+    /* font-weight: bold; */
+}
+
 .epic {
 
     background: #c2d3e2;
@@ -328,7 +333,7 @@ input[type=number]::-webkit-outer-spin-button {
 .cell.time-box .shift-box {
 
     position: relative;
-    width: 400px;
+    width: 100px;
     height: 100%;
     background: #ccc;
     background: none;
@@ -347,10 +352,14 @@ input[type=number]::-webkit-outer-spin-button {
 .row.epic .cell.time-box .shift-box .chunk {
 
     background: #fff500;
-    background: rgb(255, 0, 0);
+    background: rgb(204, 95, 95);
+    background: #a19dab;
+    background: #e38787;
 }
 
 .row.task .cell.time-box .shift-box .chunk {
 
     background: rgb(34, 130, 255);
+    background: #ff9595;
+    background: #a19dab;
 }
