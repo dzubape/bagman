@@ -63,7 +63,6 @@ body {
     
     display: flex;
     position: relative;
-    overflow-x: hidden;
     overflow-wrap: break-word;
 }
 
@@ -315,3 +314,43 @@ input[type=number]::-webkit-outer-spin-button {
 
       -webkit-appearance: none;
 } */
+
+.cell.time-box {
+
+    overflow: hidden;
+    background: #ccc;
+    background: #eee;
+    background: #9fbf9f;
+    background: #dee2de;
+    flex: auto;
+}
+
+.cell.time-box .shift-box {
+
+    position: relative;
+    width: 400px;
+    height: 100%;
+    background: #ccc;
+    background: none;
+    background: #d7d7d7;
+}
+
+.cell.time-box .shift-box .chunk {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100px;
+}
+
+.row.epic .cell.time-box .shift-box .chunk {
+
+    background: #fff500;
+    background: rgb(255, 0, 0);
+}
+
+.row.task .cell.time-box .shift-box .chunk {
+
+    background: rgb(34, 130, 255);
+}
