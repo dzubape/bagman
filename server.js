@@ -16,8 +16,20 @@ console.log(servConfig);
 const app = express();
 const router = express.Router();
 
-app.use('/', express.static(path.join(__dirname, "public", "html")));
-app.use('/js', express.static(path.join(__dirname, "public", "js")));
+router.use('/', express.static(path.join(__dirname, "dist")));
+router.use('/src', express.static(path.join(__dirname, "storage")));
+
+router.use('/data', express.json());
+router.post('/data', (req, resp, next) => {
+
+    console.log('POST /data', req.body);
+    
+    // next();
+
+    fs.writeFile(path.join(__dirname, "storage", "data.bak.json"), req.body, next);
+
+    // next();
+});
 
 router.get('/hello', (req, resp, next) => {
 

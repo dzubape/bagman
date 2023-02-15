@@ -765,10 +765,10 @@ let footer = new FooterRow();
 
 roadmapCtrl.ping();
 
-let saveModelOnUnload = () => {saveModel()};
+let saveModelOnUnload = () => {saveRemoteModel()};
 let saveCurrentModel = () => {};
 
-let saveModel = () => {
+let saveLocalModel = () => {
 
     let roadmapModel = modelWithoutParent(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
@@ -782,6 +782,32 @@ let saveModel = () => {
     console.log(settings);
 
     localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
+    localStorage.setItem('roadmapSettings', JSON.stringify(settings));
+};
+
+let saveRemoteModel = () => {
+
+    let roadmapModel = modelWithoutParent(roadmapCtrl.model);
+    console.log('saveModel:', roadmapModel);
+
+    let settings = {
+        descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
+        shiftPos: interStyle.d.shiftPos,
+        shiftWidth: interStyle.d.shiftWidth,
+    };
+
+    console.log(settings);
+
+    fetch('/data', {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: '["hello"]'
+        // body: JSON.stringify(roadmapModel),
+    })
+    // localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
     localStorage.setItem('roadmapSettings', JSON.stringify(settings));
 };
 
@@ -805,10 +831,59 @@ let buildBranch = (taskCtrl, taskModel) => {
     }
 }
 
-let loadModel = () => {
+const fetchSettings = () => {
+
+    let settings = localStorage.getItem('roadmapSettings');
+    if(settings) {
+
+        settings = JSON.parse(settings);
+        console.log(settings);
+        interStyle.descriptionColumnWidth(settings.descriptionColumnWidth)
+        interStyle.shiftPos(settings.shiftPos)
+        interStyle.shiftWidth(settings.shiftWidth)
+    }
+}
+
+const fetchLocalModel = () => {
 
     let roadmapModel = localStorage.getItem('roadmap');
     console.log('Model on load:', roadmapModel);
+
+    if(!roadmapModel)
+        return;
+
+    roadmapModel = JSON.parse(roadmapModel);
+    console.log('loadModel:', roadmapModel);
+    buildBranch(roadmapCtrl, roadmapModel);
+    roadmapCtrl.pullDuration();
+    roadmapCtrl.forwardStart(0);
+
+    fetchSettings();
+};
+
+const fetchRemoteModel = () => {
+
+
+    fetch('/src/data.json', {
+        method: 'GET',
+    })
+    .then((resp) => resp.json())
+    .then((resp) => {
+
+        let roadmapModel = resp;
+        console.log('Model fetch:', roadmapModel);
+
+
+        buildBranch(roadmapCtrl, roadmapModel);
+        roadmapCtrl.pullDuration();
+        roadmapCtrl.forwardStart(0);
+
+        fetchSettings();
+        
+        // saveRemoteModel();
+    });
+
+    return;
 
     if(!roadmapModel)
         return;
@@ -831,6 +906,13 @@ let loadModel = () => {
     }
 };
 
-loadModel();
+if(window.location.port == 13048) {
+
+    fetchRemoteModel();
+}
+else {
+
+    fetchLocalModel();
+}
 
 addEventListener('unload', saveModelOnUnload);
