@@ -804,8 +804,8 @@ let saveRemoteModel = () => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: '["hello"]'
-        // body: JSON.stringify(roadmapModel),
+        // body: '["hello"]'
+        body: JSON.stringify(roadmapModel),
     })
     // localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
     localStorage.setItem('roadmapSettings', JSON.stringify(settings));
