@@ -81,6 +81,7 @@ body {
 .cell.descr {
 
     display: flex;
+    width: 327px;
 }
 
 .cell.descr .content {

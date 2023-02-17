@@ -3,7 +3,7 @@
 import $ from 'jquery';
 
 const minTimelineWidth = 200;
-const minDescrColWidth = 100;
+const minDescrColWidth = 340;
 let descriptionColumnWidth = minDescrColWidth;
 
 let viewSettings = {
@@ -27,7 +27,7 @@ let interStyle = new function() {
 
     this.update = () => {
 
-        style = `
+        let style = `
 .cell.descr {
 
     width: ${s.descriptionColumnWidth}px;
@@ -282,6 +282,15 @@ let HeaderRow = function() {
     .append(
         $duration = $('<span>')
     )
+    .append(
+        $('<input>')
+        .prop('type', 'button')
+        .prop('value', 'reset')
+        .on('click', () => {
+
+            fetchRemoteModel('/src/data.bak.json');
+        })
+    )
     .appendTo(content)
 
     $('<div>')
@@ -295,7 +304,7 @@ let HeaderRow = function() {
     .addClass('duration')
     .appendTo(parentBox)
     .append(
-        $days = $('<div>')
+        $('<div>')
         .addClass('days')
         .addClass('title')
         .append(
@@ -304,7 +313,7 @@ let HeaderRow = function() {
         )
     )
     .append(
-        $days = $('<div>')
+        $('<div>')
         .addClass('hours')
         .addClass('title')
         .append(
@@ -313,7 +322,7 @@ let HeaderRow = function() {
         )
     )
     .append(
-        $days = $('<div>')
+        $('<div>')
         .addClass('minutes')
         .addClass('title')
         .append(
@@ -861,10 +870,10 @@ const fetchLocalModel = () => {
     fetchSettings();
 };
 
-const fetchRemoteModel = () => {
+const fetchRemoteModel = (url) => {
 
 
-    fetch('/src/data.json', {
+    fetch(url || '/src/data.json', {
         method: 'GET',
     })
     .then((resp) => resp.json())

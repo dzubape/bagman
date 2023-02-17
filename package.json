@@ -4,9 +4,9 @@
   "description": "Packing of weighed entities",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "npm run server.js",
-    "debug": "parcel --host 0.0.0.0 ./public/index.html"
+    "back-dev": "nodemon server.js",
+    "start": "parcel build ./public/index.html && node server.js",
+    "front-dev": "parcel --host 0.0.0.0 ./public/index.html"
   },
   "author": "Petro Dz.",
   "license": "ISC",

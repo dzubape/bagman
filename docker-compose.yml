@@ -3,11 +3,15 @@ version: "3.7"
 services:
   roadmap:
     container_name: roadmap
-    image: node:18-bullseye-slim
-    command: npm run debug
-
+    # image: node:18-bullseye-slim
+    image: roadmap
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: npm run docker
+    # user: "1004:1001"
     volumes:
       - .:/app
     working_dir: /app
     ports:
-      - 13050:1234
+      - 13050:13048
