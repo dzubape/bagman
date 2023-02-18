@@ -691,6 +691,7 @@ let TaskRow = function(parentTask) {
     };
 
     const $duration = {};
+    const durationPadding = 50;
 
     $('<div>')
     .addClass('cell')
@@ -731,27 +732,53 @@ let TaskRow = function(parentTask) {
     .addClass('v-splitter')
     .appendTo(parentBox)
 
-    $('<div>')
+    $duration.timeBox = $('<div>')
     .addClass('cell')
     .addClass('time-box')
     .appendTo(parentBox)
     .append(
-        $('<div>')
+        $duration.shiftBox = $('<div>')
         .addClass('shift-box')
         .append(
             $duration.chunk = $('<div>')
             .addClass('chunk')
+            .on('dblclick', (e) => {
+        
+                // debugger;
+                const timeBoxWidth = $duration.timeBox.width();
+                const targetChunkWidth = timeBoxWidth - 2 * durationPadding;
+                const shiftWidth = targetChunkWidth / this.duration2minutes(this.model.duration) * this.shiftSize * 60;
+                interStyle.shiftWidth(shiftWidth);
+
+                let shiftPos = $duration.chunk.position().left;
+                shiftPos -= durationPadding;
+                shiftPos = shiftPos > 0 ? shiftPos : 0;
+                interStyle.shiftPos(-shiftPos);
+        
+                return false;
+            })
         )
     )
     .on('wheel', (e) => {
 
-        if(e.shiftKey) {
+        // console.log(e);
+        if(e.ctrlKey) {
+
+            const mousePos = e.screenX - $duration.timeBox.offset().left;
+            const mouseTime = (mousePos - interStyle.d.shiftPos) / $duration.shiftBox.width(); // days
 
             const k = 1.1;
             const scale = e.originalEvent.deltaY > 0 ? k : 1 / k;
-            interStyle.shiftWidth(interStyle.d.shiftWidth * scale);
+
+            const shiftWidth = $duration.shiftBox.width() * scale;
+            interStyle.shiftWidth(shiftWidth);
+
+            let shiftPos = -(mouseTime * shiftWidth - mousePos);
+            shiftPos = shiftPos < 0 ? shiftPos : 0;
+            interStyle.shiftPos(shiftPos);
+
         }
-        else {
+        else if(e.shiftKey) {
 
             let delta = 50;
             delta = e.originalEvent.deltaY > 0 ? delta : -delta;
@@ -759,7 +786,19 @@ let TaskRow = function(parentTask) {
             pos = pos < 0 ? pos : 0;
             interStyle.shiftPos(pos);
         }
+        else
+            return;
+            
         e.stopPropagation();
+        return false;
+    })
+    .on('dblclick', (e) => {
+
+        let pos = $duration.chunk.position().left;
+        pos -= durationPadding;
+        pos = pos > 0 ? pos : 0;
+        interStyle.shiftPos(-pos);
+
         return false;
     })
 };
@@ -891,28 +930,6 @@ const fetchRemoteModel = (url) => {
         
         // saveRemoteModel();
     });
-
-    return;
-
-    if(!roadmapModel)
-        return;
-
-    roadmapModel = JSON.parse(roadmapModel);
-    console.log('loadModel:', roadmapModel);
-    buildBranch(roadmapCtrl, roadmapModel);
-    roadmapCtrl.pullDuration();
-    roadmapCtrl.forwardStart(0);
-
-    let settings = localStorage.getItem('roadmapSettings');
-    console.log("settings:", settings);
-    if(settings) {
-
-        settings = JSON.parse(settings);
-        console.log(settings);
-        interStyle.descriptionColumnWidth(settings.descriptionColumnWidth)
-        interStyle.shiftPos(settings.shiftPos)
-        interStyle.shiftWidth(settings.shiftWidth)
-    }
 };
 
 if(window.location.port == 13048) {
