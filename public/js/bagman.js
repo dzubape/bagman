@@ -692,6 +692,7 @@ let TaskRow = function(parentTask) {
 
     const $duration = {};
     const durationPadding = 50;
+    const maxPxPerHour = 30;
 
     $('<div>')
     .addClass('cell')
@@ -745,9 +746,17 @@ let TaskRow = function(parentTask) {
             .on('dblclick', (e) => {
         
                 // debugger;
+                const durationInMinutes = this.duration2minutes(this.model.duration);
+                const durationInHours = durationInMinutes / 60;
                 const timeBoxWidth = $duration.timeBox.width();
-                const targetChunkWidth = timeBoxWidth - 2 * durationPadding;
-                const shiftWidth = targetChunkWidth / this.duration2minutes(this.model.duration) * this.shiftSize * 60;
+                let targetChunkWidth = timeBoxWidth - 2 * durationPadding;
+                const targetChunkPxPerHour = targetChunkWidth / durationInHours;
+                if(targetChunkPxPerHour > maxPxPerHour) {
+
+                    console.warn(`${targetChunkPxPerHour.toFixed(0)}px/hour is too large. Reduced to max ${maxPxPerHour}px/hour`);
+                    targetChunkWidth = durationInHours * maxPxPerHour;
+                }
+                const shiftWidth = targetChunkWidth / durationInHours * this.shiftSize;
                 interStyle.shiftWidth(shiftWidth);
 
                 let shiftPos = $duration.chunk.position().left;
