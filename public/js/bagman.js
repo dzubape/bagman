@@ -216,7 +216,7 @@ let HeaderRow = function() {
 
     this.appendSubTask = (subTask) => {
 
-        childBox.append(subTask.$);
+        childBox.append(subTask.$view);
         this.model.subtasks.push(subTask.model);
         subTask.model.parent = this.model;
     };
@@ -258,7 +258,7 @@ let HeaderRow = function() {
     .addClass('row')
     .addClass('header')
 
-    this.$ = $row;
+    this.$view = $row;
     $row.appendTo(roadmapBox);
 
     let parentBox = $('<div>')
@@ -353,7 +353,7 @@ let FooterRow = function() {
     .addClass('row')
     .addClass('footer')
 
-    this.$ = $row;
+    this.$view = $row;
     $row.appendTo(roadmapBox);
 
     let parentBox = $('<div>')
@@ -501,7 +501,7 @@ let TaskRow = function(parentTask) {
         let s = this.model.parent.subtasks;
         let idx = s.indexOf(this.model);
         s.splice(idx, 1);
-        this.$.remove();
+        this.$view.remove();
         roadmapCtrl.pullDuration();
 
         saveCurrentModel();
@@ -509,7 +509,7 @@ let TaskRow = function(parentTask) {
 
     this.appendSubTask = (subTask) => {
 
-        childBox.append(subTask.$);
+        childBox.append(subTask.$view);
         this.model.subtasks.push(subTask.model);
         subTask.model.parent = this.model;
 
@@ -577,7 +577,7 @@ let TaskRow = function(parentTask) {
             thisTask,
         );
 
-        nextTask.ctrl.$.before(thisTask.ctrl.$);
+        nextTask.ctrl.$view.before(thisTask.ctrl.$view);
 
         return false;
     }
@@ -613,7 +613,7 @@ let TaskRow = function(parentTask) {
     .prop('task-ctrl', this)
 
 
-    this.$ = $row;
+    this.$view = $row;
 
     (parentTask || roadmapCtrl).appendSubTask(this);
 
