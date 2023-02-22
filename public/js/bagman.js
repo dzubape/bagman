@@ -534,65 +534,50 @@ let TaskRow = function(parentTask) {
     const getDistSq = (x, y) => {
 
         return x*x + y*y;
-    }
-
-    let counter = 0;
-    const model = this.model;
-    const findTaskPos = (searchTask, subtasks) => {
-
-        const idx = subtasks.indexOf(searchTask);
-        if(idx >= 0)
-            return [idx, subtasks];
-        
-        for(let i=0; i<subtasks.length; ++i) {
-
-            const subtask = subtasks[i];
-
-            if(subtask.subtasks) {
-
-                const found = findTaskPos(searchTask, subtask.subtasks);
-                if(found)
-                    return found;
-            }
-        }
     };
 
-    const thisTaskCtrl = this;
+    const thisTask = this.model;
     const dropTask = function(e) {
 
-        console.log('counter:', counter++);
         e.stopPropagation();
 
-        $(this).css('background', 'red')
+        // $(this).css('background', 'red')
 
         $('.roadmap .row').off('mouseup', dropTask);
 
         let nextTaskCtrl = $(this).prop('task-ctrl');
+        const nextTask = nextTaskCtrl.model;
 
         $(window).off('mousemove', onDragTask);
         $row.removeClass('dragging');
         roadmapBox.removeClass('drag-mode');
 
-        const nextTaskIdx = nextTaskCtrl.model.parent.subtasks.indexOf(nextTaskCtrl.model);
-        thisTaskCtrl.model.parent.subtasks.splice(
-            thisTaskCtrl.model.parent.subtasks.indexOf(thisTaskCtrl.model),
+
+        // aware of inserting within subtask
+        for(let task=nextTask; task; task=task.parent) {
+
+            if(task == thisTask) {
+
+                return false;
+            }
+        }
+
+        const nextTaskIdx = nextTask.parent.subtasks.indexOf(nextTask);
+
+        // remove task.model from current position
+        thisTask.parent.subtasks.splice(
+            thisTask.parent.subtasks.indexOf(thisTask),
             1,
         );
-        nextTaskCtrl.model.parent.subtasks.splice(
+
+        // insert task.model in new position
+        nextTask.parent.subtasks.splice(
             nextTaskIdx,
             0,
-            thisTaskCtrl.model,
+            thisTask,
         );
 
-        // const [idx, subtasks] = findTaskPos(nextTaskCtrl.model, roadmapCtrl.model.subtasks);
-        // console.log(idx, subtasks);
-
-        // thisTaskCtrl.model.parent.subtasks.splice(
-        //     thisTaskCtrl.model.parent.subtasks.indexOf(thisTaskCtrl.model),
-        //     1,
-        // );
-
-        // subtasks.splice(idx, 0, thisTaskCtrl.model);
+        nextTask.ctrl.$.before(thisTask.ctrl.$);
 
         return false;
     }
