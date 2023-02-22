@@ -157,6 +157,7 @@ let RowPrototype = function() {
         for(let i=0; i<subtasks.length; ++i) {
 
             let subtask = subtasks[i];
+            // subtask.ctrl.setStart(this.model.start + minutes);
             subtask.ctrl.pullDuration();
             minutes += this.duration2minutes(subtask.ctrl.getDuration());
         }
@@ -558,17 +559,18 @@ let TaskRow = function(parentTask) {
 
             if(task == thisTask) {
 
+                console.warn("Can't drag Task into it's subtask!")
                 return false;
             }
         }
-
-        const nextTaskIdx = nextTask.parent.subtasks.indexOf(nextTask);
 
         // remove task.model from current position
         thisTask.parent.subtasks.splice(
             thisTask.parent.subtasks.indexOf(thisTask),
             1,
         );
+
+        const nextTaskIdx = nextTask.parent.subtasks.indexOf(nextTask);
 
         // insert task.model in new position
         nextTask.parent.subtasks.splice(
@@ -578,6 +580,9 @@ let TaskRow = function(parentTask) {
         );
 
         nextTask.ctrl.$view.before(thisTask.ctrl.$view);
+
+        roadmapCtrl.pullDuration();
+        roadmapCtrl.forwardStart(0);
 
         return false;
     }
@@ -629,6 +634,10 @@ let TaskRow = function(parentTask) {
     .addClass('cell')
     .addClass('descr')
     .appendTo(parentBox)
+    .on('selectstart', (e) => {
+
+        return false;
+    })
     .on('mousedown', (e) => {
 
 
@@ -636,13 +645,16 @@ let TaskRow = function(parentTask) {
         $(window).on('mousemove', onDragTask);
         $(window).on('mouseup', onDragEnd);
 
-        e.stopPropagation();
-        return false;
+        // e.stopPropagation();
     })
 
     let content = $('<div>')
     .addClass('content')
     .appendTo(descr)
+    .on('selectstart', (e) => {
+
+        e.stopPropagation();
+    })
 
     let openarrow = $('<label>')
     .addClass('openarrow')
@@ -720,7 +732,7 @@ let TaskRow = function(parentTask) {
         .html('&#65291;')
         .html('&#11175;')
         .html('	&#43;')
-        .click(() => {
+        .on('click', () => {
     
             const initialTaskSplit = !this.model.subtasks.length;
             const task = new TaskRow(this);
@@ -741,7 +753,7 @@ let TaskRow = function(parentTask) {
         .html('&#10005;')
         .html('	&#8855;')
         .html('	&#9746;')
-        .click(() => {
+        .on('click', () => {
     
             if(confirm(`Remove task "${this.model.descr}"?`))
                 this.remove();
