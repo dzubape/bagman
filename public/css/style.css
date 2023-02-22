@@ -75,11 +75,11 @@ body {
 
     display: block;
     box-sizing: border-box;
-
 }
 
 .cell.descr {
 
+    position: relative;
     display: flex;
     width: 327px;
 }
@@ -227,6 +227,8 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+
+    box-sizing: border-box;
 }
 
 .task-tool-box .button {
@@ -337,8 +339,8 @@ input[type=number]::-webkit-outer-spin-button {
     width: 100px;
     height: 100%;
     background: #ccc;
-    background: none;
     background: #d7d7d7;
+    background: none;
 }
 
 .cell.time-box .shift-box .chunk {
@@ -363,4 +365,35 @@ input[type=number]::-webkit-outer-spin-button {
     background: rgb(34, 130, 255);
     background: #ff9595;
     background: #a19dab;
+}
+
+.row.dragging > .parent-box .descr {
+
+    background: yellow;
+}
+
+.roadmap.drag-mode
+.row:not(.dragging)
+.cell.descr:hover > .paste-box {
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: red;
+    width: 100%;
+    height: 3px;
+}
+
+.roadmap.drag-mode
+.row.dragging
+.cell.descr:hover > .paste-box {
+
+    display: none;
+}
+
+.roadmap input[type=button].reset {
+
+    margin-left: 5px;
+    padding: 3px 5px;
+    border-radius: 3px;
 }

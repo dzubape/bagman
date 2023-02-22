@@ -221,7 +221,10 @@ let HeaderRow = function() {
         subTask.model.parent = this.model;
     };
 
-    let $duration;
+    let $duration = {
+        counter: null,
+        timeline: null,
+    };
     this.setDuration = function(duration) {
 
         console.warn('HeaderRow.setDuration:');
@@ -231,7 +234,7 @@ let HeaderRow = function() {
         const minutes = this.duration2minutes(duration);
         const days = Math.ceil(minutes / 60 / this.shiftSize);
 
-        $duration.text(days);
+        $duration.counter.text(days);
     };
 
     // this.pullDuration = () => {
@@ -251,20 +254,20 @@ let HeaderRow = function() {
     //     this.setDuration(this.minutes2duration(minutes));
     // };
 
-    let row = $('<div>')
+    let $row = $('<div>')
     .addClass('row')
     .addClass('header')
 
-    this.$ = row;
-    row.appendTo(roadmapBox);
+    this.$ = $row;
+    $row.appendTo(roadmapBox);
 
     let parentBox = $('<div>')
     .addClass('parent-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let childBox = $('<div>')
     .addClass('child-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let descr = $('<div>')
     .addClass('cell')
@@ -275,20 +278,22 @@ let HeaderRow = function() {
     .addClass('content')
     .appendTo(descr)
 
+    let $resetButton;
     let text = $('<div>')
     .addClass('text')
     .text('Task description')
     .text('Totaly days: ')
     .append(
-        $duration = $('<span>')
+        $duration.counter = $('<span>')
     )
     .append(
-        $('<input>')
+        $resetButton = $('<input>')
+        .addClass('reset')
         .prop('type', 'button')
         .prop('value', 'reset')
         .on('click', () => {
 
-            fetchRemoteModel('/src/data.bak.json');
+            //fetchRemoteModel('/src/data.bak.json');
         })
     )
     .appendTo(content)
@@ -335,24 +340,29 @@ let HeaderRow = function() {
     .addClass('cell')
     .addClass('v-splitter')
     .appendTo(parentBox)
+
+    $('<div>')
+    .addClass('cell')
+    .addClass('duration')
+    .appendTo(parentBox)
 };
 
 let FooterRow = function() {
 
-    let row = $('<div>')
+    let $row = $('<div>')
     .addClass('row')
     .addClass('footer')
 
-    this.$ = row;
-    row.appendTo(roadmapBox);
+    this.$ = $row;
+    $row.appendTo(roadmapBox);
 
     let parentBox = $('<div>')
     .addClass('parent-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let childBox = $('<div>')
     .addClass('child-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let descr = $('<div>')
     .addClass('cell')
@@ -484,7 +494,6 @@ let TaskRow = function(parentTask) {
         const days = minutes / 60 / this.shiftSize * 100; 
 
         $duration.chunk.css('width', days + '%');
-
     };
 
     this.remove = () => {
@@ -521,26 +530,130 @@ let TaskRow = function(parentTask) {
         this.model.unrolled = false;
     };
 
-    let row = $('<div>')
+    let mousePressPos;
+    const getDistSq = (x, y) => {
+
+        return x*x + y*y;
+    }
+
+    let counter = 0;
+    const model = this.model;
+    const findTaskPos = (searchTask, subtasks) => {
+
+        const idx = subtasks.indexOf(searchTask);
+        if(idx >= 0)
+            return [idx, subtasks];
+        
+        for(let i=0; i<subtasks.length; ++i) {
+
+            const subtask = subtasks[i];
+
+            if(subtask.subtasks) {
+
+                const found = findTaskPos(searchTask, subtask.subtasks);
+                if(found)
+                    return found;
+            }
+        }
+    };
+
+    const thisTaskCtrl = this;
+    const dropTask = function(e) {
+
+        console.log('counter:', counter++);
+        e.stopPropagation();
+
+        $(this).css('background', 'red')
+
+        $('.roadmap .row').off('mouseup', dropTask);
+
+        let nextTaskCtrl = $(this).prop('task-ctrl');
+
+        $(window).off('mousemove', onDragTask);
+        $row.removeClass('dragging');
+        roadmapBox.removeClass('drag-mode');
+
+        const nextTaskIdx = nextTaskCtrl.model.parent.subtasks.indexOf(nextTaskCtrl.model);
+        thisTaskCtrl.model.parent.subtasks.splice(
+            thisTaskCtrl.model.parent.subtasks.indexOf(thisTaskCtrl.model),
+            1,
+        );
+        nextTaskCtrl.model.parent.subtasks.splice(
+            nextTaskIdx,
+            0,
+            thisTaskCtrl.model,
+        );
+
+        // const [idx, subtasks] = findTaskPos(nextTaskCtrl.model, roadmapCtrl.model.subtasks);
+        // console.log(idx, subtasks);
+
+        // thisTaskCtrl.model.parent.subtasks.splice(
+        //     thisTaskCtrl.model.parent.subtasks.indexOf(thisTaskCtrl.model),
+        //     1,
+        // );
+
+        // subtasks.splice(idx, 0, thisTaskCtrl.model);
+
+        return false;
+    }
+    
+    const onDragTask = (e) => {
+
+        console.log('onDragTask:', this.model.descr);
+
+        const minShift = 20;
+        const minShiftSq = minShift * minShift;
+        const mousePos = {x: e.screenX, y: e.screenY};
+        if(getDistSq(mousePressPos.x - mousePos.x, mousePressPos.y - mousePos.y) > minShiftSq) {
+
+            roadmapBox.addClass('drag-mode');
+            $row.addClass('dragging')
+            $('.roadmap .row').on('mouseup', dropTask);
+            $(window).off('mousemove', onDragTask);
+        }
+
+        return false;
+    };
+
+    const onDragEnd = () => {
+
+        $row.removeClass('dragging');
+        roadmapBox.removeClass('drag-mode');
+        $(window).off('mousemove', onDragTask);
+    };
+
+    const $row = $('<div>')
     .addClass('row')
     .addClass(parentTask == roadmapCtrl ? 'epic' : 'task')
+    .prop('task-ctrl', this)
 
-    this.$ = row;
+
+    this.$ = $row;
 
     (parentTask || roadmapCtrl).appendSubTask(this);
 
     let parentBox = $('<div>')
     .addClass('parent-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let childBox = $('<div>')
     .addClass('child-box')
-    .appendTo(row)
+    .appendTo($row)
 
     let descr = $('<div>')
     .addClass('cell')
     .addClass('descr')
     .appendTo(parentBox)
+    .on('mousedown', (e) => {
+
+
+        mousePressPos = {x: e.screenX, y: e.screenY};
+        $(window).on('mousemove', onDragTask);
+        $(window).on('mouseup', onDragEnd);
+
+        e.stopPropagation();
+        return false;
+    })
 
     let content = $('<div>')
     .addClass('content')
@@ -611,7 +724,6 @@ let TaskRow = function(parentTask) {
     })
 
     $('<div>')
-    .addClass('cell')
     .addClass('task-tool-box')
     .appendTo(descr)
     .append(
@@ -651,15 +763,9 @@ let TaskRow = function(parentTask) {
         })
     )
 
-    /*
     $('<div>')
-    .addClass('appendor-box-med')
-    .appendTo(parentBox)
-    .append(
-        $('<div>')
-        .addClass('append-button')
-    )
-    */
+    .addClass('paste-box')
+    .appendTo(descr)
 
     $('<div>')
     .addClass('cell')
@@ -822,7 +928,7 @@ let footer = new FooterRow();
 
 roadmapCtrl.ping();
 
-let saveModelOnUnload = () => {saveRemoteModel()};
+let saveModelOnUnload = () => {saveLocalModel()};
 let saveCurrentModel = () => {};
 
 let saveLocalModel = () => {
