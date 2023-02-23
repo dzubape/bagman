@@ -28,12 +28,12 @@ let interStyle = new function() {
     this.update = () => {
 
         let style = `
-.cell.descr {
+.roadmap .row .cell.descr {
 
     width: ${s.descriptionColumnWidth}px;
 }
 
-.roadmap .cell.time-box .shift-box {
+.roadmap .row .cell.time-box .shift-box {
 
     left: ${s.shiftPos}px;
     width: ${s.shiftWidth}px;
@@ -366,6 +366,8 @@ let HeaderRow = function() {
 };
 
 let FooterRow = function() {
+
+    return
 
     let $row = $('<div>')
     .addClass('row')
@@ -837,6 +839,7 @@ let TaskRow = function(parentTask) {
     const $duration = {};
     const durationPadding = 50;
     const maxPxPerHour = 30;
+    const minPxPerShift = this.shiftSize * 2;
 
     $('<div>')
     .addClass('cell')
@@ -923,7 +926,11 @@ let TaskRow = function(parentTask) {
             const k = 1.1;
             const scale = e.originalEvent.deltaY > 0 ? k : 1 / k;
 
-            const shiftWidth = $duration.shiftBox.width() * scale;
+            let shiftWidth = $duration.shiftBox.width() * scale;
+            if(shiftWidth < minPxPerShift) {
+
+                shiftWidth = minPxPerShift;
+            }
             interStyle.shiftWidth(shiftWidth);
 
             let shiftPos = -(mouseTime * shiftWidth - mousePos);

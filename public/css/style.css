@@ -1,25 +1,45 @@
-body,
-div {
-    border: 0;
-    margin: 0;
-    padding: 0;
-}
-
 * {
 
     font-family: Roboto, "Droid Sans";
 }
 
+html {
+
+    height: 100%;
+}
+
+body,
+div {
+    border: 0;
+    margin: 0;
+}
+
 body {
+    height: 100%;
     padding: 10px;
+    box-sizing: border-box;
 }
 
 .roadmap {
 
     background: #71a0cc;
-    background: transaprent;
     color: #021324;
     font-size: 15px;
+/* 
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+*/
+
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.roadmap .header {
+    
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .roadmap .header > .parent {
@@ -29,7 +49,6 @@ body {
 
 .roadmap .row.header > .parent-box .content {
 
-    /* font-weight: bold; */
 }
 
 .epic {
@@ -406,8 +425,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .roadmap .row.header > .child-box {
 
-    overflow-y:scroll;
-    max-height: 600px;
+    overflow-y: auto;
+    max-height: 100%;
 }
 
 .roadmap .row.header > .parent-box {
@@ -431,3 +450,10 @@ input[type=number]::-webkit-outer-spin-button {
     width: 100%;
 }
 
+/* .roadmap .row.header
+> .parent-box > .time-box
+.shift:nth-child(even) {
+
+    display: none;
+
+} */
