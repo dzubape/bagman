@@ -370,6 +370,7 @@ input[type=number]::-webkit-outer-spin-button {
 .row.dragging > .parent-box .descr {
 
     background: yellow;
+    background: #a287c0;
 }
 .roadmap.drag-mode {
 
@@ -384,6 +385,7 @@ input[type=number]::-webkit-outer-spin-button {
     left: 0;
     top: 0;
     background: red;
+    background: #c84242;
     width: 100%;
     height: 3px;
 }
@@ -401,3 +403,31 @@ input[type=number]::-webkit-outer-spin-button {
     padding: 3px 5px;
     border-radius: 3px;
 }
+
+.roadmap .row.header > .child-box {
+
+    overflow-y:scroll;
+    max-height: 600px;
+}
+
+.roadmap .row.header > .parent-box {
+
+    border-bottom: solid 1px #071d30;
+}
+
+.roadmap .row.header > .parent-box > .time-box {
+
+    background: none;
+}
+
+.roadmap .row.header > .parent-box > .time-box .shift {
+
+    position: absolute;
+    bottom: 0;
+    box-sizing:border-box;
+    border-right: solid 1px #46759f;
+    background: none;
+    text-align:center;
+    width: 100%;
+}
+

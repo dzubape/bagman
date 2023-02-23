@@ -237,6 +237,18 @@ let HeaderRow = function() {
         const days = Math.ceil(minutes / 60 / this.shiftSize);
 
         $duration.counter.text(days);
+
+        // $duration.timeline.clear();
+        $duration.shiftBox.html(null);
+
+        for(let i=0; i<days; ++i) {
+
+            $('<div>')
+            .addClass('shift')
+            .css('left', i*100 + '%')
+            .text(i+1)
+            .appendTo($duration.shiftBox)
+        }
     };
 
     // this.pullDuration = () => {
@@ -343,10 +355,14 @@ let HeaderRow = function() {
     .addClass('v-splitter')
     .appendTo(parentBox)
 
-    $('<div>')
+    $duration.timeBox = $('<div>')
     .addClass('cell')
-    .addClass('duration')
+    .addClass('time-box')
     .appendTo(parentBox)
+    .append(
+        $duration.shiftBox = $('<div>')
+        .addClass('shift-box')
+    )
 };
 
 let FooterRow = function() {
