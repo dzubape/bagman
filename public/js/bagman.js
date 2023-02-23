@@ -160,6 +160,7 @@ let RowPrototype = function() {
             // subtask.ctrl.setStart(this.model.start + minutes);
             subtask.ctrl.pullDuration();
             minutes += this.duration2minutes(subtask.ctrl.getDuration());
+            // subtask.ctrl.setDuration(subtask.ctrl.getDuration());
         }
 
         this.setDuration(this.minutes2duration(minutes));
@@ -546,13 +547,12 @@ let TaskRow = function(parentTask) {
 
         $('.roadmap .row').off('mouseup', dropTask);
 
-        let nextTaskCtrl = $(this).prop('task-ctrl');
+        const nextTaskCtrl = $(this).prop('task-ctrl');
         const nextTask = nextTaskCtrl.model;
 
         $(window).off('mousemove', onDragTask);
         $row.removeClass('dragging');
         roadmapBox.removeClass('drag-mode');
-
 
         // aware of inserting within subtask
         for(let task=nextTask; task; task=task.parent) {
@@ -563,6 +563,21 @@ let TaskRow = function(parentTask) {
                 return false;
             }
         }
+
+        if(
+            thisTask.ctrl.$view.hasClass('epic') &&
+            nextTask.ctrl.$view.hasClass('task')
+        )
+            thisTask.ctrl.$view
+            .removeClass('epic')
+            .addClass('task')
+        else if(
+            thisTask.ctrl.$view.hasClass('task') &&
+            nextTask.ctrl.$view.hasClass('epic')
+        )
+            thisTask.ctrl.$view
+            .removeClass('task')
+            .addClass('epic')
 
         // remove task.model from current position
         thisTask.parent.subtasks.splice(
@@ -579,7 +594,12 @@ let TaskRow = function(parentTask) {
             thisTask,
         );
 
+        thisTask.parent = nextTask.parent;
+
         nextTask.ctrl.$view.before(thisTask.ctrl.$view);
+
+        console.log('roadmapCtrl.model:', roadmapCtrl.model);
+        
 
         roadmapCtrl.pullDuration();
         roadmapCtrl.forwardStart(0);
@@ -728,9 +748,6 @@ let TaskRow = function(parentTask) {
         .addClass('button')
         .addClass('task-appendor')
         .prop('title', 'Add subtask')
-        .html('&#8600;')
-        .html('&#65291;')
-        .html('&#11175;')
         .html('	&#43;')
         .on('click', () => {
     
@@ -740,9 +757,16 @@ let TaskRow = function(parentTask) {
 
                 task.setDuration(this.getDuration());
             }
+            else {
+
+                task.setDuration(this.minutes2duration(0));
+            }
             
             this.unRoll();
             saveCurrentModel();
+
+            roadmapCtrl.pullDuration();
+            roadmapCtrl.forwardStart(0);
         })
     )
     .append(
@@ -791,6 +815,7 @@ let TaskRow = function(parentTask) {
 
         this.setDuration(duration);
         roadmapCtrl.pullDuration();
+        roadmapCtrl.forwardStart(0);
     };
 
     const $duration = {};
