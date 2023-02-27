@@ -2,6 +2,9 @@
 
 import $ from 'jquery';
 
+const hasBackend = window.location.port == 13048;
+console.log('Bakend mode:', hasBackend);
+
 const minTimelineWidth = 200;
 const minDescrColWidth = 340;
 let descriptionColumnWidth = minDescrColWidth;
@@ -298,9 +301,11 @@ let HeaderRow = function() {
     .addClass('text')
     .text('Task description')
     .text('Totaly days: ')
+    .appendTo(content)
     .append(
         $duration.counter = $('<span>')
     )
+    if(0) _
     .append(
         $resetButton = $('<input>')
         .addClass('reset')
@@ -321,7 +326,6 @@ let HeaderRow = function() {
             saveRemoteModel();
         })
     )
-    .appendTo(content)
 
     $('<div>')
     .addClass('cell')
@@ -424,11 +428,11 @@ let FooterRow = function() {
     .on('mousedown', onSplitterMove)
 };
 
-const modelWithoutParent = (task) => {
+const formatModel = (task) => {
 
     let m = {
         descr: task.descr,
-        start: task.start,
+        // start: task.start,
         duration: task.duration,
         unrolled: task.unrolled,
         subtasks: [],
@@ -438,7 +442,7 @@ const modelWithoutParent = (task) => {
 
         let subtask = task.subtasks[i];
 
-        m.subtasks.push(modelWithoutParent(subtask));
+        m.subtasks.push(formatModel(subtask));
     }
 
     return m;
@@ -987,13 +991,14 @@ roadmapCtrl.ping();
 let saveModelOnUnload = () => {
     
     saveLocalModel();
-    saveRemoteModel();
+    if(hasBackend)
+        saveRemoteModel();
 };
 let saveCurrentModel = () => {};
 
 let saveLocalModel = () => {
 
-    let roadmapModel = modelWithoutParent(roadmapCtrl.model);
+    let roadmapModel = formatModel(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
 
     let settings = {
@@ -1010,7 +1015,7 @@ let saveLocalModel = () => {
 
 let saveRemoteModel = () => {
 
-    let roadmapModel = modelWithoutParent(roadmapCtrl.model);
+    let roadmapModel = formatModel(roadmapCtrl.model);
     console.log('saveModel:', roadmapModel);
 
     let settings = {
@@ -1087,15 +1092,14 @@ const fetchLocalModel = () => {
 const fetchRemoteModel = (url) => {
 
 
-    fetch(url || '/src/data.json', {
+    fetch(url || '/db/data', {
         method: 'GET',
     })
     .then((resp) => resp.json())
     .then((resp) => {
 
         let roadmapModel = resp;
-        console.log('Model fetch:', roadmapModel);
-
+        // console.log('Model fetch:', roadmapModel);
 
         buildBranch(roadmapCtrl, roadmapModel);
         roadmapCtrl.pullDuration();
@@ -1107,7 +1111,7 @@ const fetchRemoteModel = (url) => {
     });
 };
 
-if(window.location.port == 13048) {
+if(hasBackend) {
 
     fetchRemoteModel();
 }

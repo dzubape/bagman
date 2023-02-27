@@ -140,15 +140,11 @@ body {
             display: flex;
             flex-direction: column;
             height: 100%;
-    
-            > .parent-box {
-                
-                background: #71a0cc;
-            }
 
             > .parent-box {
 
                 border-bottom: solid 1px #071d30;
+                background: #71a0cc;
                 
                 > .time-box {
 
@@ -171,6 +167,7 @@ body {
 
                 overflow-y: auto;
                 max-height: 100%;
+                border-bottom: 1px solid #46759f;
             }
         }
 
