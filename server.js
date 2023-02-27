@@ -6,6 +6,11 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const { promises, constants } = require('fs')
+
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./db.sqlite3');
+db.run("CREATE TABLE IF NOT EXISTS 'backup' (backup_id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT)");
+
 const lockFile = path => {
     const lockPath = `${path}.lock`
     return promises.open(lockPath, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR).catch(() => lockFile(path))
@@ -15,13 +20,6 @@ const unlockFile = path => {
     return promises.unlink(lockPath).catch(() => unlockFile(path))
 };
 
-// async () => {
-//     const path = 'some/path/to/file'
-//     await lockFile(path)
-//     // Do something with the file
-//     // ...
-//     await unlockFile(path)
-// }
 
 /// server config
 const { exit } = require('process');
@@ -38,8 +36,8 @@ const router = express.Router();
 router.use('/', express.static(path.join(__dirname, "dist")));
 router.use('/src', express.static(path.join(__dirname, "storage")));
 
-router.use('/data', bodyParser.json());
-router.post('/data', (req, resp, next) => {
+// router.use('/data', bodyParser.json());
+router.post('/data', bodyParser.json(), (req, resp, next) => {
     
     let data = JSON.stringify(req.body);
     console.log('POST /data', req.body);
@@ -109,6 +107,66 @@ router.get('/ping', (req, resp, next) => {
     next();
 });
 
+router.put('/save', (req, resp, next) => {
+
+    let data = JSON.stringify(req.body);
+
+    fs.writeFileSync(filepath, data, 'utf8');
+
+    db.serialize(() => {
+
+        const stmt = db.prepare("INSERT INTO 'backup' VALUES (?)");
+        stmt.run(data)
+        stmt.finalize();
+    });
+});
+
+router.get('/db/test', (req, resp, next) => {
+
+    console.log('>> GET /db/test');
+
+    resp.status(200);
+    resp.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    resp.flushHeaders();
+
+    db.serialize(() => {
+    
+        db.all("SELECT `backup_id`, `data` FROM `backup` ORDER BY `backup_id` DESC LIMIT 1", (err, rows) => {
+
+
+            if(rows.length) {
+
+                const row = rows[rows.length-1];
+                resp.write(`${row.backup_id}: ${row.data}`);
+            }
+            next();
+        })
+    });
+    
+});
+
+// router.use('/db/test', bodyParser.text());
+router.post('/db/test', bodyParser.text(), (req, resp, next) => {
+
+    
+    let data = req.body;
+    console.log('>> POST /db/test/<data>');
+    // console.log('>> req:', req);
+    console.log('>> body:', data);
+    // console.log('>> params:', req.params);
+
+    db.serialize(() => {
+
+        const stmt = db.prepare("INSERT INTO 'backup' (data) VALUES (?)");
+        stmt.run(data)
+        const res = stmt.finalize();
+
+        console.log('res:', res);
+        next();
+    });
+
+});
+
 router.use('*', (req, resp, next) => {
 
     resp.end();
@@ -118,3 +176,5 @@ app.use(router);
 
 const server = http.createServer(app);
 server.listen(servConfig.port, () => console.log(`server started on port: ${servConfig.port}`));
+
+// db.close();
