@@ -293,6 +293,7 @@ let HeaderRow = function() {
     .appendTo(descr)
 
     let $resetButton;
+    let $saveButton;
     let text = $('<div>')
     .addClass('text')
     .text('Task description')
@@ -308,6 +309,16 @@ let HeaderRow = function() {
         .on('click', () => {
 
             //fetchRemoteModel('/src/data.bak.json');
+        })
+    )
+    .append(
+        $saveButton = $('<input>')
+        .addClass('reset')
+        .prop('type', 'button')
+        .prop('value', 'save')
+        .on('click', () => {
+
+            saveRemoteModel();
         })
     )
     .appendTo(content)
@@ -973,7 +984,11 @@ let footer = new FooterRow();
 
 roadmapCtrl.ping();
 
-let saveModelOnUnload = () => {saveLocalModel()};
+let saveModelOnUnload = () => {
+    
+    saveLocalModel();
+    saveRemoteModel();
+};
 let saveCurrentModel = () => {};
 
 let saveLocalModel = () => {
@@ -1006,11 +1021,11 @@ let saveRemoteModel = () => {
 
     console.log(settings);
 
-    fetch('/data', {
-        method: 'POST',
+    fetch('/db/data', {
+        method: 'PUT',
         cache: 'no-cache',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
         },
         // body: '["hello"]'
         body: JSON.stringify(roadmapModel),

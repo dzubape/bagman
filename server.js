@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const textParser = bodyParser.text();
 
 const { promises, constants } = require('fs')
 
@@ -37,7 +39,7 @@ router.use('/', express.static(path.join(__dirname, "dist")));
 router.use('/src', express.static(path.join(__dirname, "storage")));
 
 // router.use('/data', bodyParser.json());
-router.post('/data', bodyParser.json(), (req, resp, next) => {
+router.post('/data', jsonParser, (req, resp, next) => {
     
     let data = JSON.stringify(req.body);
     console.log('POST /data', req.body);
@@ -107,18 +109,52 @@ router.get('/ping', (req, resp, next) => {
     next();
 });
 
-router.put('/save', (req, resp, next) => {
+router.put('/db/data', jsonParser, (req, resp, next) => {
 
-    let data = JSON.stringify(req.body);
-
-    fs.writeFileSync(filepath, data, 'utf8');
+    
+    let data = req.body;
+    console.log('>> PUT /db/data');
+    console.log('>> body:', data);
 
     db.serialize(() => {
 
-        const stmt = db.prepare("INSERT INTO 'backup' VALUES (?)");
-        stmt.run(data)
+        const stmt = db.prepare("INSERT INTO 'backup' (data) VALUES (?)");
+        stmt.run(JSON.stringify(data))
         stmt.finalize();
+        resp.status(200).send({status: 'ok'});
+        next();
     });
+});
+
+router.get('/db/data', (req, resp, next) => {
+
+    console.log('>> GET /db/data');
+
+    resp.status(200);
+    resp.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    resp.flushHeaders();
+
+    db.serialize(() => {
+    
+        db.all("SELECT `backup_id`, `data` FROM `backup` ORDER BY `backup_id` DESC LIMIT 1", (err, rows) => {
+
+            if(rows.length) {
+
+                const row = rows[rows.length-1];
+                // resp.write(`${row.backup_id}: ${row.data}`);
+                resp.write(`${row.data}\n`);
+                resp.write('------------\n')
+                resp.write(`backup_id: ${row.backup_id}\n`)
+            }
+            else {
+
+                resp.write({});
+            }
+            resp.write('\n')
+            next();
+        })
+    });
+    
 });
 
 router.get('/db/test', (req, resp, next) => {
@@ -145,15 +181,12 @@ router.get('/db/test', (req, resp, next) => {
     
 });
 
-// router.use('/db/test', bodyParser.text());
-router.post('/db/test', bodyParser.text(), (req, resp, next) => {
+router.put('/db/test', textParser, (req, resp, next) => {
 
     
     let data = req.body;
-    console.log('>> POST /db/test/<data>');
-    // console.log('>> req:', req);
+    console.log('>> PUT /db/test');
     console.log('>> body:', data);
-    // console.log('>> params:', req.params);
 
     db.serialize(() => {
 
@@ -164,7 +197,6 @@ router.post('/db/test', bodyParser.text(), (req, resp, next) => {
         console.log('res:', res);
         next();
     });
-
 });
 
 router.use('*', (req, resp, next) => {
