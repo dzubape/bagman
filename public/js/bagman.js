@@ -525,6 +525,10 @@ let TaskRow = function(parentTask) {
         $duration.hours.val(duration.hours);
         $duration.minutes.val(duration.minutes);
 
+        $duration.daysFix.text(duration.days);
+        $duration.hoursFix.text(duration.hours);
+        $duration.minutesFix.text(duration.minutes);
+
         const minutes = this.duration2minutes(duration);
         const days = minutes / 60 / this.shiftSize * 100; 
 
