@@ -22,7 +22,7 @@ body {
 
 .roadmap {
 
-    background: #71a0cc;
+    background: none;
     color: #021324;
     font-size: 15px;
 /* 
@@ -141,9 +141,36 @@ body {
             flex-direction: column;
             height: 100%;
     
-            > .parent {
-                background: #177cd5;
-                color: #071d30;
+            > .parent-box {
+                
+                background: #71a0cc;
+            }
+
+            > .parent-box {
+
+                border-bottom: solid 1px #071d30;
+                
+                > .time-box {
+
+                    background: none;
+
+                    .shift {
+
+                        position: absolute;
+                        bottom: 0;
+                        box-sizing:border-box;
+                        border-right: solid 1px #46759f;
+                        background: none;
+                        text-align:center;
+                        width: 100%;
+                    }
+                }
+            }
+
+            > .child-box {
+
+                overflow-y: auto;
+                max-height: 100%;
             }
         }
 
@@ -353,31 +380,4 @@ body {
     margin-left: 5px;
     padding: 3px 5px;
     border-radius: 3px;
-}
-
-.roadmap .row.header > .child-box {
-
-    overflow-y: auto;
-    max-height: 100%;
-}
-
-.roadmap .row.header > .parent-box {
-
-    border-bottom: solid 1px #071d30;
-}
-
-.roadmap .row.header > .parent-box > .time-box {
-
-    background: none;
-}
-
-.roadmap .row.header > .parent-box > .time-box .shift {
-
-    position: absolute;
-    bottom: 0;
-    box-sizing:border-box;
-    border-right: solid 1px #46759f;
-    background: none;
-    text-align:center;
-    width: 100%;
 }
