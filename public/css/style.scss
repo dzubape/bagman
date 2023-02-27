@@ -105,6 +105,65 @@ body {
                     font-size: 0;
                 }
             }
+
+            &.duration {
+
+                display: flex;
+                flex-direction: row;
+
+                .title, input, .label {
+
+                    display: inline-block;
+                    width: 40px;
+                    height: 100%;
+                    text-align: right;
+                    vertical-align: middle;
+                    box-sizing: border-box;
+                    border: none;
+                }
+
+                input {
+
+                    background: #fff;
+
+                    &:not(:first-of-type) {
+
+                        border-left: solid 1px #e2e2e2;
+                    }
+                }
+
+                .title, .label {
+
+                    display: inline-block;
+                    text-align: center;
+                    vertical-align: middle;
+
+                    &:not(:first-of-type) {
+
+                        border-left: solid 1px #416a8d;
+                    }
+
+                    div {
+
+                        writing-mode: vertical-rl;
+                        /* text-orientation: mixed; */
+                        display: block;
+                        padding: 10px;
+                    }
+                }
+
+                .label {
+
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .minutes {
+
+                    display: none !important;
+                }
+            }
         }
 
         &:not(.header):not(:has(> .parent-box .openchecker:checked)) .child-box {
@@ -114,7 +173,12 @@ body {
 
         &:has(> .child-box:not(:empty)) {
 
-            .cell.duration input {
+            > .parent-box .cell.duration input {
+
+                display: none;
+            }
+
+            .cell.duration .title {
 
                 background: transparent;
                 border-color: #517494;
@@ -127,6 +191,11 @@ body {
             > .parent-box .openarrow {
 
                 visibility: hidden;
+            }
+
+            > .parent-box .cell.duration .label {
+
+                display: none;
             }
 
             .cell.duration input {
@@ -256,50 +325,6 @@ body {
                 color: #f00000;
             }
         }
-    }
-}
-
-.cell.duration {
-
-    .title, input {
-
-        width: 40px;
-        height: 100%;
-        text-align: right;
-        vertical-align: middle;
-        box-sizing: border-box;
-        border: none;
-    }
-
-    input {
-
-        &:not(:first-child) {
-
-            border-left: solid 1px #e2e2e2;
-        }
-    }
-
-    .title {
-
-        display: inline-block;
-
-        &:not(:first-child) {
-
-            border-left: solid 1px #416a8d;
-        }
-
-        div {
-
-            writing-mode: vertical-rl;
-            /* text-orientation: mixed; */
-            display: block;
-            padding: 10px;
-        }
-    }
-
-    .minutes {
-
-        display: none !important;
     }
 }
 

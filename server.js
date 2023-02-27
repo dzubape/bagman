@@ -103,6 +103,37 @@ router.get('/db/data', (req, resp, next) => {
     
 });
 
+router.get('/db/data/debug', (req, resp, next) => {
+
+    console.log('>> GET /db/data');
+
+    resp.status(200);
+    resp.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    resp.flushHeaders();
+
+    db.serialize(() => {
+    
+        db.all("SELECT `backup_id`, `data` FROM `backup` ORDER BY `backup_id` DESC LIMIT 1", (err, rows) => {
+
+            if(rows.length) {
+
+                const row = rows[rows.length-1];
+                // resp.write(`${row.backup_id}: ${row.data}`);
+                resp.write(`${row.data}\n`);
+                resp.write('------------\n')
+                resp.write(`backup_id: ${row.backup_id}\n`)
+            }
+            else {
+
+                resp.write({});
+            }
+            resp.write('\n')
+            // next();
+            resp.end();
+        })
+    });
+});
+
 router.get('/db/data/:backup_id', (req, resp, next) => {
 
     console.log('>> GET /db/data/:backup_id', req.params.backup_id);
@@ -130,40 +161,7 @@ router.get('/db/data/:backup_id', (req, resp, next) => {
             resp.write('\n')
             next();
         });
-
     });
-    
-});
-
-router.get('/db/data/debug', (req, resp, next) => {
-
-    console.log('>> GET /db/data');
-
-    resp.status(200);
-    resp.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    resp.flushHeaders();
-
-    db.serialize(() => {
-    
-        db.all("SELECT `backup_id`, `data` FROM `backup` ORDER BY `backup_id` DESC LIMIT 1", (err, rows) => {
-
-            if(rows.length) {
-
-                const row = rows[rows.length-1];
-                // resp.write(`${row.backup_id}: ${row.data}`);
-                resp.write(`${row.data}\n`);
-                resp.write('------------\n')
-                resp.write(`backup_id: ${row.backup_id}\n`)
-            }
-            else {
-
-                resp.write({});
-            }
-            resp.write('\n')
-            next();
-        })
-    });
-    
 });
 
 router.get('/db/test', (req, resp, next) => {

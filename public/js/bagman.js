@@ -889,6 +889,24 @@ let TaskRow = function(parentTask) {
         .val('0')
         .on('change', formatDuration)
     )
+    .append(
+        $duration.daysFix = $('<div>')
+        .addClass('days')
+        .addClass('label')
+        .text('0')
+    )
+    .append(
+        $duration.hoursFix = $('<div>')
+        .addClass('hours')
+        .addClass('label')
+        .text('0')
+    )
+    .append(
+        $duration.minutesFix = $('<div>')
+        .addClass('minutes')
+        .addClass('label')
+        .text('0')
+    )
 
     $('<div>')
     .addClass('cell')
