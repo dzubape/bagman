@@ -287,6 +287,16 @@ let HeaderRow = function() {
     .addClass('child-box')
     .appendTo($row)
 
+    this.getScroll = () => {
+
+        return childBox.scrollTop();
+    };
+
+    this.setScroll = (value) => {
+
+        childBox.scrollTop(value);
+    };
+
     let descr = $('<div>')
     .addClass('cell')
     .addClass('descr')
@@ -1043,6 +1053,7 @@ let saveLocalModel = () => {
         descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
         shiftPos: interStyle.d.shiftPos,
         shiftWidth: interStyle.d.shiftWidth,
+        scroll: roadmapCtrl.getScroll(),
     };
 
     console.log(settings);
@@ -1060,6 +1071,7 @@ let saveRemoteModel = () => {
         descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
         shiftPos: interStyle.d.shiftPos,
         shiftWidth: interStyle.d.shiftWidth,
+        scroll: roadmapCtrl.getScroll(),
     };
 
     console.log(settings);
@@ -1107,6 +1119,7 @@ const fetchSettings = () => {
         interStyle.descriptionColumnWidth(settings.descriptionColumnWidth)
         interStyle.shiftPos(settings.shiftPos)
         interStyle.shiftWidth(settings.shiftWidth)
+        roadmapCtrl.setScroll(settings.scroll)
     }
 }
 
