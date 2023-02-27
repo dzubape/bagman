@@ -164,6 +164,25 @@ router.get('/db/data/:backup_id', (req, resp, next) => {
     });
 });
 
+router.delete('/db/data', (req, resp, next) => {
+
+    console.log('>> DELETE /db/data/');
+
+    resp.status(200);
+    resp.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    resp.flushHeaders();
+
+    db.serialize(() => {
+
+        const stmt = db.prepare("DELETE FROM `backup` WHERE `backup_id`=(SELECT MAX(`backup_id`) FROM `backup`)");
+        stmt.run();
+        resp.write('removed 1 row');
+        resp.write('\n')
+        // next();
+        resp.end();
+    });
+});
+
 router.get('/db/test', (req, resp, next) => {
 
     console.log('>> GET /db/test');
@@ -193,15 +212,12 @@ router.put('/db/test', textParser, (req, resp, next) => {
     
     let data = req.body;
     console.log('>> PUT /db/test');
-    console.log('>> body:', data);
 
     db.serialize(() => {
 
         const stmt = db.prepare("INSERT INTO 'backup' (data) VALUES (?)");
         stmt.run(data)
-        const res = stmt.finalize();
-
-        console.log('res:', res);
+        stmt.finalize();
         next();
     });
 });

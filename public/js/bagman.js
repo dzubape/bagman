@@ -3,6 +3,7 @@
 import $ from 'jquery';
 
 const hasBackend = window.location.port == 13048;
+const editorMode = location.hash == '#editor';
 console.log('Bakend mode:', hasBackend);
 
 const minTimelineWidth = 200;
@@ -305,15 +306,24 @@ let HeaderRow = function() {
     .append(
         $duration.counter = $('<span>')
     )
-    if(0) _
     .append(
         $resetButton = $('<input>')
         .addClass('reset')
         .prop('type', 'button')
         .prop('value', 'reset')
+        .css('display', editorMode ? '' : 'none')
         .on('click', () => {
 
-            //fetchRemoteModel('/src/data.bak.json');
+            // fetchRemoteModel('/src/data.bak.json');
+            fetch('/db/data/', {
+                method: 'DELETE',
+            })
+            .then((resp) => {
+
+                console.log(resp);
+                removeEventListener('unload', saveModelOnUnload);
+                window.location = window.location;
+            })
         })
     )
     .append(
@@ -321,6 +331,7 @@ let HeaderRow = function() {
         .addClass('reset')
         .prop('type', 'button')
         .prop('value', 'save')
+        .css('display', 'none')
         .on('click', () => {
 
             saveRemoteModel();
@@ -1018,7 +1029,7 @@ roadmapCtrl.ping();
 let saveModelOnUnload = () => {
     
     saveLocalModel();
-    if(hasBackend && location.hash == '#editor')
+    if(hasBackend && editorMode)
         saveRemoteModel();
 };
 let saveCurrentModel = () => {};
