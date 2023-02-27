@@ -859,7 +859,7 @@ let TaskRow = function(parentTask) {
     const durationPadding = 50;
     const maxPxPerHour = 10;
     const maxPxPerShift = maxPxPerHour * this.shiftSize;
-    const minPxPerShift = this.shiftSize * 2;
+    const minPxPerShift = this.shiftSize * 3;
 
     $('<div>')
     .addClass('cell')
