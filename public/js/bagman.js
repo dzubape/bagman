@@ -736,7 +736,7 @@ let TaskRow = function(parentTask) {
 
         const codeEnter = 13;
         const codeEsc = 27;
-        console.log(e.keyCode)
+        // console.log(e.keyCode)
 
         if(e.keyCode == codeEnter) {
 
@@ -1009,7 +1009,7 @@ roadmapCtrl.ping();
 let saveModelOnUnload = () => {
     
     saveLocalModel();
-    if(hasBackend)
+    if(hasBackend && location.hash == '#editor')
         saveRemoteModel();
 };
 let saveCurrentModel = () => {};
