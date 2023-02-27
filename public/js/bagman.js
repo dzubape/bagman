@@ -853,7 +853,8 @@ let TaskRow = function(parentTask) {
 
     const $duration = {};
     const durationPadding = 50;
-    const maxPxPerHour = 30;
+    const maxPxPerHour = 10;
+    const maxPxPerShift = maxPxPerHour * this.shiftSize;
     const minPxPerShift = this.shiftSize * 2;
 
     $('<div>')
@@ -963,6 +964,10 @@ let TaskRow = function(parentTask) {
             if(shiftWidth < minPxPerShift) {
 
                 shiftWidth = minPxPerShift;
+            }
+            else if(shiftWidth > maxPxPerShift) {
+
+                shiftWidth = maxPxPerShift;
             }
             interStyle.shiftWidth(shiftWidth);
 
