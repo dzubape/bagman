@@ -240,7 +240,7 @@ let HeaderRow = function() {
         const minutes = this.duration2minutes(duration);
         const days = Math.ceil(minutes / 60 / this.shiftSize);
 
-        $duration.counter.text(days);
+        $duration.counter.text(`${days}/${Math.ceil(days/2)}`);
 
         // $duration.timeline.clear();
         $duration.shiftBox.html(null);
@@ -311,7 +311,7 @@ let HeaderRow = function() {
     let text = $('<div>')
     .addClass('text')
     .text('Task description')
-    .text('Totaly days: ')
+    .text('Total days/per capita: ')
     .appendTo(content)
     .append(
         $duration.counter = $('<span>')
