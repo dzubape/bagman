@@ -772,6 +772,7 @@ let TaskRow = function(parentTask) {
     .addClass('arrow-button')
     .appendTo(openarrow)
     .html('&#129170;')
+    .html('&#8250;')
 
 
     let text = $('<div>')
