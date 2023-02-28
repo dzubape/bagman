@@ -2,10 +2,10 @@
   "name": "bagman",
   "version": "1.0.0",
   "description": "Packing of weighed entities",
-  "main": "index.js",
+  "source": "./public/index.html",
   "scripts": {
     "back-dev": "nodemon server.js",
-    "start": "parcel build ./public/index.html && node server.js",
+    "prod": "parcel build ./public/index.html && nodemon server.js",
     "front-dev": "parcel --host 0.0.0.0 ./public/index.html"
   },
   "author": "Petro Dz.",
