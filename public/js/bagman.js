@@ -75,6 +75,7 @@ interStyle.update();
 
 let roadmapBox = $('<div>')
 .addClass('roadmap')
+.addClass(editorMode ? 'editor-mode' : 'view-mode')
 .appendTo('body')
 
 let RowPrototype = function() {
@@ -718,6 +719,8 @@ let TaskRow = function(parentTask) {
     })
     .on('mousedown', (e) => {
 
+        if(!editorMode)
+            return;
 
         mousePressPos = {x: e.screenX, y: e.screenY};
         $(window).on('mousemove', onDragTask);
@@ -800,6 +803,7 @@ let TaskRow = function(parentTask) {
 
     $('<div>')
     .addClass('task-tool-box')
+    .css('display', editorMode ? '' : 'none')
     .appendTo(descr)
     .append(
         $('<div>')

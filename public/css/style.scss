@@ -89,6 +89,53 @@ body {
                         }
                     }
                 }
+
+                .task-tool-box {
+
+                    height: 100%;
+                    vertical-align: middle;
+                    padding: 5px;
+
+                    flex: auto;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+
+                    box-sizing: border-box;
+
+                    .button {
+                        display: inline-block;
+                        margin-left: 3px;
+                        font-size: 20px;
+                        cursor: pointer;
+                        /* border: solid 1px #ccc; */
+                        /* background: #acc0cb; */
+                        padding: 0 3px;
+                        border-radius: 3px;
+                        transition: color .07s;
+
+                        &.task-appendor  {
+                    
+                            color: #355d00;
+                            text-shadow: 0 0 1px #fff;
+
+                            &:hover  {
+
+                                color: #209f57;
+                            }
+                        }
+                        
+                        &.task-remover  {
+
+                            color: #6b2222;
+
+                            &:hover  {
+
+                                color: #f00000;
+                            }
+                        }
+                    }
+                }
             }
 
             &.v-splitter {
@@ -279,52 +326,27 @@ body {
             }
         }
     }
-}
 
-.task-tool-box {
+    &.view-mode {
 
-    height: 100%;
-    vertical-align: middle;
-    padding: 5px;
+        .task-tool-box {
 
-    flex: auto;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+            display: none;
+        }
 
-    box-sizing: border-box;
+        .cell.duration {
 
-    .button {
-        display: inline-block;
-        margin-left: 3px;
-        font-size: 20px;
-        cursor: pointer;
-        /* border: solid 1px #ccc; */
-        /* background: #acc0cb; */
-        padding: 0 3px;
-        border-radius: 3px;
-        transition: color .07s;
-
-        &.task-appendor  {
+            .label:not(.minutes) {
     
-            color: #355d00;
-            text-shadow: 0 0 1px #fff;
+                display: flex !important;
+            }
 
-            &:hover  {
-
-                color: #209f57;
+            input {
+                
+                display: none !important;
             }
         }
-        
-        &.task-remover  {
 
-            color: #6b2222;
-
-            &:hover  {
-
-                color: #f00000;
-            }
-        }
     }
 }
 
