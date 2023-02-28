@@ -240,8 +240,15 @@ let HeaderRow = function() {
 
         const minutes = this.duration2minutes(duration);
         const days = Math.ceil(minutes / 60 / this.shiftSize);
+        const durationPerCapita = this.minutes2duration(days / 2 * this.shiftSize * 60);
+        const daysPerMonth = 20;
+        const daysPC = durationPerCapita.days % daysPerMonth;
+        const monthsPC = Math.floor(durationPerCapita.days / daysPerMonth);
 
-        $duration.counter.text(`${days}/${Math.ceil(days/2)}`);
+
+
+        $duration.counter.text(`Total days: ${days} | Per capita: ${Math.ceil(days/2)} | Months: ${(days/2/20).toPrecision(2)}`);
+        $duration.counter.text(`Total days: ${days} | Per capita: ${Math.ceil(days/2)} (${monthsPC} months ${daysPC} net days)`);
 
         // $duration.timeline.clear();
         $duration.shiftBox.html(null);
@@ -312,7 +319,8 @@ let HeaderRow = function() {
     let text = $('<div>')
     .addClass('text')
     .text('Task description')
-    .text('Total days/per capita: ')
+    .text('Total days/per capita/months: ')
+    .text('')
     .appendTo(content)
     .append(
         $duration.counter = $('<span>')
