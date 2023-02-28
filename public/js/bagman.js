@@ -2,6 +2,12 @@
 
 import $ from 'jquery';
 
+$('<style>')
+.text(`
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+`)
+.appendTo('head')
+
 const hasBackend = window.location.port == 13048;
 const editorMode = location.hash == '#editor';
 console.log('Bakend mode:', hasBackend);
@@ -761,6 +767,11 @@ let TaskRow = function(parentTask) {
 
         this.model.unrolled = !this.model.unrolled;
     });
+
+    $('<span>')
+    .addClass('arrow-button')
+    .appendTo(openarrow)
+    .html('&#129170;')
 
 
     let text = $('<div>')

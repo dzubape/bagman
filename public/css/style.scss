@@ -1,6 +1,7 @@
 * {
 
     font-family: Roboto, "Droid Sans";
+    font-family: Roboto;
 }
 
 html {
@@ -75,17 +76,24 @@ body {
                         cursor: pointer;
                         padding-right: 7px;
 
-                        &:before {
+                        /* &:before */
+                        .arrow-button
+                        {
 
-                            content: '🢒';
+                            // content: '🢒';
+                            content: '\1F892';
                             font-size: 20px;
                             display: inline-block;
                             transition: transform .1s;
                         }
 
-                        &:has(.openchecker:checked):before {
+                        
+                        &:has(.openchecker:checked) {
 
-                            transform: rotate(90deg);
+                            &:before, .arrow-button {
+
+                                transform: rotate(90deg);
+                            } 
                         }
                     }
                 }
