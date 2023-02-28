@@ -751,9 +751,14 @@ let TaskRow = function(parentTask) {
         e.stopPropagation();
     })
 
-    let openarrow = $('<label>')
+    if(!window.hasOwnProperty('roadmapOpenArrowIdx'))
+        window.roadmapOpenArrowIdx = 0;
+    const openArrowId = 'open-arrow-' + (window.roadmapOpenArrowIdx++);
+
+    const  openarrow = $('<label>')
     .addClass('openarrow')
     .appendTo(content)
+    .attr('for', openArrowId)
     .on('click', (e) => {
 
         this.model.unrolled = !this.model.unrolled;
@@ -762,6 +767,7 @@ let TaskRow = function(parentTask) {
     let openchecker = $('<input>')
     .addClass('openchecker')
     .attr('type', 'checkbox')
+    .attr('id', openArrowId)
     .appendTo(openarrow)
     .on('click', (e) => {
 
@@ -975,7 +981,8 @@ let TaskRow = function(parentTask) {
             .addClass('chunk')
             .on('dblclick', (e) => {
         
-                // debugger;
+                e.preventDefault();
+                
                 const durationInMinutes = this.duration2minutes(this.model.duration);
                 const durationInHours = durationInMinutes / 60;
                 const timeBoxWidth = $duration.timeBox.width();
@@ -1040,6 +1047,8 @@ let TaskRow = function(parentTask) {
         return false;
     })
     .on('dblclick', (e) => {
+
+        e.preventDefault();
 
         let pos = $duration.chunk.position().left;
         pos -= durationPadding;
