@@ -63,7 +63,6 @@ router.put('/db/data', jsonParser, (req, resp, next) => {
     
     let data = req.body;
     console.log('>> PUT /db/data');
-    console.log('>> body:', data);
 
     db.serialize(() => {
 
