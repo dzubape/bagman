@@ -8,9 +8,10 @@ $('<style>')
 `)
 .appendTo('head')
 
-const hasBackend = window.location.port == 13048;
-const editorMode = location.hash == '#editor';
+const hasBackend = (window.location.port == 13048) || (window.location.hostname == 'roadmap.load.notmy.website');
+const editorMode = (location.hash == '#editor');
 console.log('Bakend mode:', hasBackend);
+console.log('Editor mode:', editorMode);
 
 const minTimelineWidth = 200;
 const minDescrColWidth = 340;
@@ -339,7 +340,9 @@ let HeaderRow = function() {
         .css('display', editorMode ? '' : 'none')
         .on('click', () => {
 
-            // fetchRemoteModel('/src/data.bak.json');
+            if(!confirm('Are you sure to drop last record?'))
+                return;
+
             fetch('/db/data/', {
                 method: 'DELETE',
             })
@@ -356,7 +359,7 @@ let HeaderRow = function() {
         .addClass('reset')
         .prop('type', 'button')
         .prop('value', 'save')
-        .css('display', 'none')
+        .css('display', editorMode ? '' : 'none')
         .on('click', () => {
 
             saveRemoteModel();
@@ -1069,11 +1072,17 @@ let footer = new FooterRow();
 
 roadmapCtrl.ping();
 
+const setNeedUploadModel = () => localStorage.setItem('need_upload_model', true);
+const unsetNeedUploadModel = () => localStorage.setItem('need_upload_model', false);
+const needUploadModel = () => localStorage.getItem('need_upload_model');
+
 let saveModelOnUnload = () => {
     
     saveLocalModel();
-    if(hasBackend && editorMode)
+    if(hasBackend && editorMode) {
+        
         saveRemoteModel();
+    }
 };
 let saveCurrentModel = () => {};
 
@@ -1096,9 +1105,11 @@ let saveLocalModel = () => {
 };
 
 let saveRemoteModel = () => {
+    
+    setNeedUploadModel();
 
     let roadmapModel = formatModel(roadmapCtrl.model);
-    console.log('saveModel:', roadmapModel);
+    // console.log('saveModel:', roadmapModel);
 
     let settings = {
         descriptionColumnWidth: interStyle.d.descriptionColumnWidth,
@@ -1107,7 +1118,7 @@ let saveRemoteModel = () => {
         scroll: roadmapCtrl.getScroll(),
     };
 
-    console.log(settings);
+    // console.log(settings);
 
     fetch('/db/data', {
         method: 'PUT',
@@ -1118,6 +1129,8 @@ let saveRemoteModel = () => {
         // body: '["hello"]'
         body: JSON.stringify(roadmapModel),
     })
+    .then(unsetNeedUploadModel)
+
     // localStorage.setItem('roadmap', JSON.stringify(roadmapModel));
     localStorage.setItem('roadmapSettings', JSON.stringify(settings));
 };
@@ -1159,13 +1172,13 @@ const fetchSettings = () => {
 const fetchLocalModel = () => {
 
     let roadmapModel = localStorage.getItem('roadmap');
-    console.log('Model on load:', roadmapModel);
+    // console.log('Model on load:', roadmapModel);
 
     if(!roadmapModel)
         return;
 
     roadmapModel = JSON.parse(roadmapModel);
-    console.log('loadModel:', roadmapModel);
+    // console.log('loadModel:', roadmapModel);
     buildBranch(roadmapCtrl, roadmapModel);
     roadmapCtrl.pullDuration();
     roadmapCtrl.forwardStart(0);
@@ -1174,7 +1187,6 @@ const fetchLocalModel = () => {
 };
 
 const fetchRemoteModel = (url) => {
-
 
     fetch(url || '/db/data', {
         method: 'GET',
@@ -1190,14 +1202,20 @@ const fetchRemoteModel = (url) => {
         roadmapCtrl.forwardStart(0);
 
         fetchSettings();
-        
-        // saveRemoteModel();
     });
 };
 
 if(hasBackend) {
 
-    fetchRemoteModel();
+    if(editorMode && needUploadModel()) {
+
+        fetchLocalModel();
+        saveRemoteModel();
+    }
+    else {
+
+        fetchRemoteModel();
+    }
 }
 else {
 
